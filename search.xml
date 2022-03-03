@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Markdown教程</title>
+    <url>/2022/03/03/Markdown%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<h1 id="‘-’表示标题"><a href="#‘-’表示标题" class="headerlink" title="‘#’表示标题"></a>‘#’表示标题</h1><h2 id="‘-’表示二级标题"><a href="#‘-’表示二级标题" class="headerlink" title="‘##’表示二级标题"></a>‘##’表示二级标题</h2><pre><code>正文直接写
+
+加粗前后用**或者control+B
+**强调**
+
+用一个*变斜或者control+I
+*变斜*
+
+1. 有序列表1.+空格
+   1. tab添加二级列表
+2. 二级列表
+
+插入图片：
+1. 复制图片
+2. control+Alt+v
+![](2022-03-03-23-48-30.png)
+*orz*
+</code></pre>
+<h3 id="‘-’表示三级标题"><a href="#‘-’表示三级标题" class="headerlink" title="‘###’表示三级标题"></a>‘###’表示三级标题</h3><pre><code>&quot;$$&quot;中间可以用Latex&quot;$$&quot;
+</code></pre>
+<p>$$<br>\lim_{x \to \infin}\frac{sin(t)}{x}&#x3D;1<br>$$</p>
+<p>##表格</p>
+<table>
+<thead>
+<tr>
+<th>1</th>
+<th align="center">2</th>
+<th>3</th>
+</tr>
+</thead>
+</table>
+<p>##链接<br>control+c<br>contron+v<br><a href="https://recursiondzl.github.io/">https://recursiondzl.github.io/</a></p>
+<p>##code</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>##视频教程<br><a href="https://www.bilibili.com/video/BV1si4y1472o">https://www.bilibili.com/video/BV1si4y1472o</a></p>
+<p><img src="/2022-03-03-23-56-58.png"></p>
+]]></content>
+      <tags>
+        <tag>Markdown</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2022/03/03/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -27,6 +72,9 @@
 <p>4.hexo clean 清除缓存</p>
 <p>5.hexo d 上传到github仓库</p>
 ]]></content>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
   </entry>
   <entry>
     <title>之前的博客</title>
