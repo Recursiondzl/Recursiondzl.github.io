@@ -24,4 +24,11 @@
     <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>hexo使用教程</title>
+    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
+<p>2.hexo g 重新生成博客</p>
+]]></content>
+  </entry>
 </search>
