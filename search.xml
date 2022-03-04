@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Transform解析</title>
+    <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p>
+<h2 id="2-Encoder-Decoder结构原理"><a href="#2-Encoder-Decoder结构原理" class="headerlink" title="2.Encoder-Decoder结构原理"></a>2.Encoder-Decoder结构原理</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-09-48.png" alt></p>
+<h1 id="Transformer-原理"><a href="#Transformer-原理" class="headerlink" title="Transformer 原理"></a>Transformer 原理</h1><h2 id="1-Transformer整体结构"><a href="#1-Transformer整体结构" class="headerlink" title="1.Transformer整体结构"></a>1.Transformer整体结构</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-14-17.png" alt></p>
+<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-15-32.png" alt></p>
+<h2 id="2-Transformer的Encoder"><a href="#2-Transformer的Encoder" class="headerlink" title="2.Transformer的Encoder"></a>2.Transformer的Encoder</h2><p>  Encoder block是由6个encoder堆叠而成，Nx=6。从图中我们可以看出一个encoder由Multi-Head Attention 和 全连接神经网络Feed Forward Network构成。</p>
+<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-00.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-59.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-22-33.png" alt></p>
+<h1 id="视频讲解"><a href="#视频讲解" class="headerlink" title="视频讲解"></a>视频讲解</h1><p>  <a href="https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0</a></p>
+<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-26-28.png" alt></p>
+<h2 id="1-内部结构"><a href="#1-内部结构" class="headerlink" title="1.内部结构"></a>1.内部结构</h2><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-27-29.png" alt></p>
+<p><strong>六个Encoder结构相同但参数不同，Decode也是一样的道理</strong></p>
+<h2 id="3-位置编码"><a href="#3-位置编码" class="headerlink" title="3.位置编码"></a>3.位置编码</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-35-56.png" alt><br>  2i位置用sin,2i+1位置用cos</p>
+<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-39-12.png" alt><br>   位置相加<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-40-21.png" alt> </p>
+<h2 id="4-注意力机制"><a href="#4-注意力机制" class="headerlink" title="4.注意力机制"></a>4.注意力机制</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-43-59.png" alt><br>  Q K V为三个矩阵<br>  归一化后乘以V矩阵</p>
+<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-45-57.png" alt><br>  Query 和 Key 点乘(反应向量相似度，结果越大越相似)<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-49-20.png" alt></p>
+<h3 id="4-1如何获取QKV"><a href="#4-1如何获取QKV" class="headerlink" title="4.1如何获取QKV"></a>4.1如何获取QKV</h3><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-51-23.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-53-25.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-54-32.png" alt></p>
+<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-55-22.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-56-59.png" alt><br>多头注意力机制，使用多套WQ WK WV矩阵，最后合在一起输出</p>
+<h2 id="5-残差"><a href="#5-残差" class="headerlink" title="5.残差"></a>5.残差</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-59-13.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-01-27.png" alt></p>
+<h2 id="6-Layernormal"><a href="#6-Layernormal" class="headerlink" title="6.Layernormal"></a>6.Layernormal</h2><pre><code>BN与LN的区别在于：
+</code></pre><p>  LN中同层神经元输入拥有相同的均值和方差，不同的输入样本有不同的均值和方差；<br>  BN中则针对不同神经元输入计算均值和方差，同一个batch中的输入拥有相同的均值和方差。<br>  所以，LN不依赖于batch的大小和输入sequence的深度，因此可以用于batchsize为1和RNN中对边长的输入sequence的normalize操作。</p>
+<h2 id="7-Feed-Forward"><a href="#7-Feed-Forward" class="headerlink" title="7.Feed-Forward"></a>7.Feed-Forward</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-08-50.png" alt></p>
+<h2 id="8-Decoder"><a href="#8-Decoder" class="headerlink" title="8.Decoder"></a>8.Decoder</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-15-45.png" alt><br>生成Q矩阵</p>
+]]></content>
+      <tags>
+        <tag>Deep Learning</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Markdown教程</title>
     <url>/2022/03/03/Markdown%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<p><meta name="referrer" content="no-referrer"></p>
@@ -39,42 +68,24 @@
 </table>
 </div>
 <h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>control+c<br>contron+v<br><a href="https://recursiondzl.github.io/">https://recursiondzl.github.io/</a></p>
-<h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-07-34.png" alt><br><figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure></p>
 <h2 id="视频教程"><a href="#视频教程" class="headerlink" title="视频教程"></a>视频教程</h2><p><a href="https://www.bilibili.com/video/BV1si4y1472o">https://www.bilibili.com/video/BV1si4y1472o</a></p>
 <h2 id="关于图片不显示的问题："><a href="#关于图片不显示的问题：" class="headerlink" title="关于图片不显示的问题："></a>关于图片不显示的问题：</h2><p><a href="https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0</a></p>
 <p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-11-03-04.png" alt></p>
+<hr>
+<h1 id="2022-3-4-Version-2-0"><a href="#2022-3-4-Version-2-0" class="headerlink" title="2022.3.4 Version 2.0"></a>2022.3.4 Version 2.0</h1><h2 id="1-快捷键"><a href="#1-快捷键" class="headerlink" title="1.快捷键"></a>1.快捷键</h2><p>功能        快捷键<br>加粗        Ctrl + B<br>斜体        Ctrl + I<br>引用        Ctrl + Q<br>插入链接    Ctrl + L<br>插入代码    Ctrl + K<br>插入图片    Ctrl + G<br>提升标题    Ctrl + H<br>有序列表    Ctrl + O<br>无序列表    Ctrl + U<br>横线        Ctrl + R<br>撤销        Ctrl + Z<br>重做        Ctrl + Y</p>
+<h2 id="2-字体设置斜体、粗体、删除线"><a href="#2-字体设置斜体、粗体、删除线" class="headerlink" title="2.字体设置斜体、粗体、删除线"></a>2.字体设置斜体、粗体、删除线</h2><p><em>这里是文字</em><br><em>这里是文字</em><br><strong>这里是文字</strong><br><strong><em>这里是文字</em></strong><br><del>这里是文字</del><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-05-28.png" alt></p>
+<h2 id="3-分割线"><a href="#3-分割线" class="headerlink" title="3.分割线"></a>3.分割线</h2><p>你可以在一行中用三个以上的星号(*)、减号(-)、底线(_)来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。</p>
+<h2 id="4-引用"><a href="#4-引用" class="headerlink" title="4.引用"></a>4.引用</h2><p>在被引用的文本前加上&gt;符号，以及一个空格就可以了，如果只输入了一个&gt;符号会产生一个空白的引用。</p>
+<blockquote>
+<p>好耶</p>
+</blockquote>
+<h2 id="5-引用的嵌套使用"><a href="#5-引用的嵌套使用" class="headerlink" title="5.引用的嵌套使用"></a>5.引用的嵌套使用</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-09-51.png" alt></p>
+<p><del>看教程看到一半发现有更好的教程，上面也懒得删了</del></p>
+<p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-22.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-56.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-33.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-58.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-30-16.png" alt></p>
 ]]></content>
       <tags>
         <tag>Markdown</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Transform解析</title>
-    <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p>
-<h2 id="2-Encoder-Decoder结构原理"><a href="#2-Encoder-Decoder结构原理" class="headerlink" title="2.Encoder-Decoder结构原理"></a>2.Encoder-Decoder结构原理</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-09-48.png" alt></p>
-<h1 id="Transformer-原理"><a href="#Transformer-原理" class="headerlink" title="Transformer 原理"></a>Transformer 原理</h1><h2 id="1-Transformer整体结构"><a href="#1-Transformer整体结构" class="headerlink" title="1.Transformer整体结构"></a>1.Transformer整体结构</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-14-17.png" alt></p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-15-32.png" alt></p>
-<h2 id="2-Transformer的Encoder"><a href="#2-Transformer的Encoder" class="headerlink" title="2.Transformer的Encoder"></a>2.Transformer的Encoder</h2><p>  Encoder block是由6个encoder堆叠而成，Nx=6。从图中我们可以看出一个encoder由Multi-Head Attention 和 全连接神经网络Feed Forward Network构成。</p>
-<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-00.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-59.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-22-33.png" alt></p>
-<h1 id="视频讲解"><a href="#视频讲解" class="headerlink" title="视频讲解"></a>视频讲解</h1><p>  <a href="https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0</a></p>
-<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-26-28.png" alt></p>
-<h2 id="1-内部结构"><a href="#1-内部结构" class="headerlink" title="1.内部结构"></a>1.内部结构</h2><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-27-29.png" alt></p>
-<p><strong>六个Encoder结构相同但参数不同，Decode也是一样的道理</strong></p>
-<h2 id="3-位置编码"><a href="#3-位置编码" class="headerlink" title="3.位置编码"></a>3.位置编码</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-35-56.png" alt><br>  2i位置用sin,2i+1位置用cos</p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-39-12.png" alt><br>   位置相加<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-40-21.png" alt> </p>
-<h2 id="4-注意力机制"><a href="#4-注意力机制" class="headerlink" title="4.注意力机制"></a>4.注意力机制</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-43-59.png" alt><br>  Q K V为三个矩阵<br>  归一化后乘以V矩阵</p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-45-57.png" alt><br>  Query 和 Key 点乘(反应向量相似度，结果越大越相似)<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-49-20.png" alt></p>
-<h3 id="4-1如何获取QKV"><a href="#4-1如何获取QKV" class="headerlink" title="4.1如何获取QKV"></a>4.1如何获取QKV</h3><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-51-23.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-53-25.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-54-32.png" alt></p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-55-22.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-56-59.png" alt><br>多头注意力机制，使用多套WQ WK WV矩阵，最后合在一起输出</p>
-<h2 id="5-残差"><a href="#5-残差" class="headerlink" title="5.残差"></a>5.残差</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-59-13.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-01-27.png" alt></p>
-<h2 id="6-Layernormal"><a href="#6-Layernormal" class="headerlink" title="6.Layernormal"></a>6.Layernormal</h2><pre><code>BN与LN的区别在于：
-</code></pre><p>  LN中同层神经元输入拥有相同的均值和方差，不同的输入样本有不同的均值和方差；<br>  BN中则针对不同神经元输入计算均值和方差，同一个batch中的输入拥有相同的均值和方差。<br>  所以，LN不依赖于batch的大小和输入sequence的深度，因此可以用于batchsize为1和RNN中对边长的输入sequence的normalize操作。</p>
-<h2 id="7-Feed-Forward"><a href="#7-Feed-Forward" class="headerlink" title="7.Feed-Forward"></a>7.Feed-Forward</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-08-50.png" alt></p>
-<h2 id="8-Decoder"><a href="#8-Decoder" class="headerlink" title="8.Decoder"></a>8.Decoder</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-15-45.png" alt><br>生成Q矩阵</p>
-]]></content>
-      <tags>
-        <tag>Deep Learning</tag>
       </tags>
   </entry>
   <entry>
