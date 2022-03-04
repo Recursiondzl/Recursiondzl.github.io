@@ -76,12 +76,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>sx</title>
-    <url>/2022/03/04/sx/</url>
-    <content><![CDATA[<script type="math/tex; mode=display">
-\lim_{x \to \infin}\frac{sin(t)}{x}=1</script>]]></content>
-  </entry>
-  <entry>
     <title>之前的博客</title>
     <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
