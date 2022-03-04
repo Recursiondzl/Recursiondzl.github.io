@@ -41,6 +41,8 @@
 <h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>control+c<br>contron+v<br><a href="https://recursiondzl.github.io/">https://recursiondzl.github.io/</a></p>
 <h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure>
 <h2 id="视频教程"><a href="#视频教程" class="headerlink" title="视频教程"></a>视频教程</h2><p><a href="https://www.bilibili.com/video/BV1si4y1472o">https://www.bilibili.com/video/BV1si4y1472o</a></p>
+<h2 id="关于图片不显示的问题："><a href="#关于图片不显示的问题：" class="headerlink" title="关于图片不显示的问题："></a>关于图片不显示的问题：</h2><p><a href="https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0</a></p>
+<p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-11-03-04.png" alt></p>
 ]]></content>
       <tags>
         <tag>Markdown</tag>
