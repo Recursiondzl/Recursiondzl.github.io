@@ -131,7 +131,7 @@
 <p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-11-03-04.png" alt></p>
 <hr>
 <h1 id="2022-3-4-Version-2-0"><a href="#2022-3-4-Version-2-0" class="headerlink" title="2022.3.4 Version 2.0"></a>2022.3.4 Version 2.0</h1><h2 id="1-快捷键"><a href="#1-快捷键" class="headerlink" title="1.快捷键"></a>1.快捷键</h2><p>功能        快捷键<br>加粗        Ctrl + B<br>斜体        Ctrl + I<br>引用        Ctrl + Q<br>插入链接    Ctrl + L<br>插入代码    Ctrl + K<br>插入图片    Ctrl + G<br>提升标题    Ctrl + H<br>有序列表    Ctrl + O<br>无序列表    Ctrl + U<br>横线        Ctrl + R<br>撤销        Ctrl + Z<br>重做        Ctrl + Y</p>
-<h2 id="2-字体设置斜体、粗体、删除线"><a href="#2-字体设置斜体、粗体、删除线" class="headerlink" title="2.字体设置斜体、粗体、删除线"></a>2.字体设置斜体、粗体、删除线</h2><p><em>这里是文字</em><br><em>这里是文字</em><br><strong>这里是文字</strong><br><strong><em>这里是文字</em></strong><br><del>这里是文字</del><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-05-28.png" alt></p>
+<h2 id="2-字体设置斜体、粗体、删除线"><a href="#2-字体设置斜体、粗体、删除线" class="headerlink" title="2.字体设置斜体、粗体、删除线"></a>2.字体设置斜体、粗体、删除线</h2><p><em>这里是文字</em><br>_这里是文字_<br><strong>这里是文字</strong><br><strong><em>这里是文字</em></strong><br><del>这里是文字</del><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-05-28.png" alt></p>
 <h2 id="3-分割线"><a href="#3-分割线" class="headerlink" title="3.分割线"></a>3.分割线</h2><p>你可以在一行中用三个以上的星号(*)、减号(-)、底线(_)来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。</p>
 <h2 id="4-引用"><a href="#4-引用" class="headerlink" title="4.引用"></a>4.引用</h2><p>在被引用的文本前加上&gt;符号，以及一个空格就可以了，如果只输入了一个&gt;符号会产生一个空白的引用。</p>
 <blockquote>
@@ -143,6 +143,35 @@
 ]]></content>
       <tags>
         <tag>Markdown</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ResNet论文解析</title>
+    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
+<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
+</li>
+<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
+</li>
+<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha</script>]]></content>
+      <tags>
+        <tag>Deep Learning</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo使用教程</title>
+    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
+<p>2.hexo g 重新生成博客</p>
+<p>3.hexo s 本地运行</p>
+<p>4.hexo clean 清除缓存</p>
+<p>5.hexo d 上传到github仓库</p>
+]]></content>
+      <tags>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -193,16 +222,12 @@
 ]]></content>
   </entry>
   <entry>
-    <title>hexo使用教程</title>
-    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
-<p>2.hexo g 重新生成博客</p>
-<p>3.hexo s 本地运行</p>
-<p>4.hexo clean 清除缓存</p>
-<p>5.hexo d 上传到github仓库</p>
+    <title>手撕梯度消失及梯度爆炸</title>
+    <url>/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/</url>
+    <content><![CDATA[<h1 id="梯度消失and爆炸"><a href="#梯度消失and爆炸" class="headerlink" title="梯度消失and爆炸"></a>梯度消失and爆炸</h1><p><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-55-13.png" alt><br>以上图为例开始推起来，先说明几点，i1，i2是输入节点，h1，h2为隐藏层节点，o1，o2为输出层节点，除了输入层，其他两层的节点结构为下图所示：<br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-57-34.png" alt><br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-58-34.png" alt></p>
 ]]></content>
       <tags>
-        <tag>hexo</tag>
+        <tag>Machine Learning</tag>
       </tags>
   </entry>
   <entry>
