@@ -87,6 +87,32 @@
       </tags>
   </entry>
   <entry>
+    <title>ResNet论文解析</title>
+    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
+<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
+</li>
+<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
+</li>
+<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha   随便写的数学公式看看hexo能不能渲染</script><ul>
+<li>1.将期望的底层映射表示为H(x)</li>
+<li>2.堆叠的非线性层拟合另一个映射F(x):=H(x)−x</li>
+<li>3.原始的映射重写为F(x)+x</li>
+</ul>
+<p><img src="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-06-20-29-48.png" alt><em>shortcut connection</em></p>
+<ul>
+<li>1）我们极深的残差网络易于优化，但当深度增加时，对应的“简单”网络（简单堆叠层）表现出更高的训练误差；2）我们的深度残差网络可以从大大增加的深度中轻松获得准确性收益，生成的结果实质上比以前的网络更好。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><h2 id="3-Deep-Residual-Learning"><a href="#3-Deep-Residual-Learning" class="headerlink" title="3.Deep Residual Learning"></a>3.Deep Residual Learning</h2><h3 id="3-1Residual-Learning"><a href="#3-1Residual-Learning" class="headerlink" title="3.1Residual Learning"></a>3.1Residual Learning</h3><h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><p>torch.nn<br>nn.Conv2d<br>nn.BatchNorm2d</p>
+]]></content>
+      <tags>
+        <tag>Deep Learning</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Markdown教程</title>
     <url>/2022/03/03/Markdown%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<p><meta name="referrer" content="no-referrer"></p>
@@ -146,6 +172,20 @@
       </tags>
   </entry>
   <entry>
+    <title>Hello World</title>
+    <url>/2022/03/03/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Transform解析</title>
     <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
     <content><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p>
@@ -179,36 +219,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ResNet论文解析</title>
-    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
-<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
-</li>
-<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
-</li>
-<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
-</li>
-</ul>
-<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha</script>]]></content>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/03/03/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>hexo使用教程</title>
     <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
@@ -222,6 +232,31 @@
       </tags>
   </entry>
   <entry>
+    <title>之前的博客</title>
+    <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>单调队列</title>
+    <url>/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/</url>
+    <content><![CDATA[<p>部分转载自：<a href="https://zhuanlan.zhihu.com/p/346354943">https://zhuanlan.zhihu.com/p/346354943</a></p>
+<ul>
+<li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。<br><img src="/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/2022-03-07-09-26-00.png" alt></li>
+</ul>
+<ul>
+<li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。</li>
+</ul>
+<p>模板题——滑动窗口：<a href="https://www.luogu.com.cn/problem/P1886">https://www.luogu.com.cn/problem/P1886</a></p>
+<blockquote>
+<p>d.front():返回的一个元素的引用。<br>d.back():返回最后一个元素的引用。<br>d.pop_back():删除尾部的元素。不返回值。<br>d.pop_front()：删除头部元素。不返回值。<br>d.push_back(e):在队尾添加一个元素e。<br>d.push_front(e):在对头添加一个元素e。</p>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * @Description: To iterate is human, to recurse divine.</span><br><span class="hljs-comment"> * @Autor: Recursion</span><br><span class="hljs-comment"> * @Date: 2022-03-06 22:36:34</span><br><span class="hljs-comment"> * @LastEditTime: 2022-03-07 09:30:15</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">int</span> n,k,x,m[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-type">int</span> cnt=<span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> maxnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<span class="hljs-comment">//数组用来存答案</span><br><span class="hljs-type">int</span> minnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span><br>&#123;<br>    <span class="hljs-type">int</span> order;<br>    <span class="hljs-type">int</span> value;<br>&#125;;<br><br>deque&lt;node&gt; maxn,minn;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span>(cin&gt;&gt;n&gt;&gt;k)&#123;<br>        node temp;<span class="hljs-comment">//暂时储存</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;i++)&#123;<br>            cin&gt;&gt;x;<br><br>            temp.order=i;<br>            temp.value=x;<span class="hljs-comment">//赋值</span><br>            <br>            <span class="hljs-keyword">while</span>(!maxn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&gt;=maxn.<span class="hljs-built_in">back</span>().value)<br>                maxn.<span class="hljs-built_in">pop_back</span>();<br>            <span class="hljs-keyword">while</span>(!minn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&lt;=minn.<span class="hljs-built_in">back</span>().value)<br>                minn.<span class="hljs-built_in">pop_back</span>();<span class="hljs-comment">//保证队列单调</span><br>                <br>            maxn.<span class="hljs-built_in">push_back</span>(temp);<br>            minn.<span class="hljs-built_in">push_back</span>(temp);<br><br>            <span class="hljs-keyword">while</span>(i-k&gt;=maxn.<span class="hljs-built_in">front</span>().order)<span class="hljs-comment">//剔除不在范围类的</span><br>                maxn.<span class="hljs-built_in">pop_front</span>();<br>            <span class="hljs-keyword">while</span>(i-k&gt;=minn.<span class="hljs-built_in">front</span>().order)<br>                minn.<span class="hljs-built_in">pop_front</span>();<br><br>            <span class="hljs-keyword">if</span>(i&gt;=k)&#123;<br>                maxnn[cnt]=maxn.<span class="hljs-built_in">front</span>().value;<br>                minnn[cnt]=minn.<span class="hljs-built_in">front</span>().value;<br>                cnt++;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;minnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        cout&lt;&lt;endl;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;maxnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)&#123;</span><br>        <span class="hljs-comment">//     int maxx=a[i];</span><br>        <span class="hljs-comment">//     int minn=a[i];</span><br>        <span class="hljs-comment">//     for(int j=i;j&lt;i+k;j++)&#123;</span><br>        <span class="hljs-comment">//         if(a[j]&lt;=minn)</span><br>        <span class="hljs-comment">//             y[i]=a[j];</span><br>        <span class="hljs-comment">//         if(a[j]&gt;=maxx)</span><br>        <span class="hljs-comment">//             x[i]=a[j];</span><br>        <span class="hljs-comment">//     &#125;</span><br>        <span class="hljs-comment">// &#125;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;x[i]&lt;&lt;&quot; &quot;;</span><br>        <span class="hljs-comment">// cout&lt;&lt;endl;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;y[i]&lt;&lt;&quot; &quot;;</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>手撕梯度消失及梯度爆炸</title>
     <url>/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/</url>
     <content><![CDATA[<h1 id="梯度消失and爆炸"><a href="#梯度消失and爆炸" class="headerlink" title="梯度消失and爆炸"></a>梯度消失and爆炸</h1><p><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-55-13.png" alt><br>以上图为例开始推起来，先说明几点，i1，i2是输入节点，h1，h2为隐藏层节点，o1，o2为输出层节点，除了输入层，其他两层的节点结构为下图所示：<br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-57-34.png" alt><br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-58-34.png" alt></p>
@@ -229,11 +264,5 @@
       <tags>
         <tag>Machine Learning</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>之前的博客</title>
-    <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
-]]></content>
   </entry>
 </search>
