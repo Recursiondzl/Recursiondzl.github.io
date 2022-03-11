@@ -149,35 +149,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ResNet论文解析</title>
-    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
-<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
-</li>
-<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
-</li>
-<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
-</li>
-</ul>
-<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha   随便写的数学公式看看hexo能不能渲染</script><ul>
-<li>1.将期望的底层映射表示为H(x)</li>
-<li>2.堆叠的非线性层拟合另一个映射F(x):=H(x)−x</li>
-<li>3.原始的映射重写为F(x)+x</li>
-</ul>
-<p><img src="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-06-20-29-48.png" alt><em>shortcut connection</em></p>
-<ul>
-<li>1）我们极深的残差网络易于优化，但当深度增加时，对应的“简单”网络（简单堆叠层）表现出更高的训练误差；2）我们的深度残差网络可以从大大增加的深度中轻松获得准确性收益，生成的结果实质上比以前的网络更好。</li>
-</ul>
-<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><h2 id="3-Deep-Residual-Learning"><a href="#3-Deep-Residual-Learning" class="headerlink" title="3.Deep Residual Learning"></a>3.Deep Residual Learning</h2><h3 id="3-1Residual-Learning"><a href="#3-1Residual-Learning" class="headerlink" title="3.1Residual Learning"></a>3.1Residual Learning</h3><h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><p>torch.nn<br>nn.Conv2d<br>nn.BatchNorm2d</p>
-]]></content>
-      <categories>
-        <category>论文解析</category>
-      </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Transform解析</title>
     <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
     <content><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p>
@@ -228,10 +199,55 @@
 ]]></content>
   </entry>
   <entry>
+    <title>ResNet论文解析</title>
+    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
+<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
+</li>
+<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
+</li>
+<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha   随便写的数学公式看看hexo能不能渲染</script><ul>
+<li>1.将期望的底层映射表示为H(x)</li>
+<li>2.堆叠的非线性层拟合另一个映射F(x):=H(x)−x</li>
+<li>3.原始的映射重写为F(x)+x</li>
+</ul>
+<p><img src="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-06-20-29-48.png" alt><em>shortcut connection</em></p>
+<ul>
+<li>1）我们极深的残差网络易于优化，但当深度增加时，对应的“简单”网络（简单堆叠层）表现出更高的训练误差；2）我们的深度残差网络可以从大大增加的深度中轻松获得准确性收益，生成的结果实质上比以前的网络更好。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><h2 id="3-Deep-Residual-Learning"><a href="#3-Deep-Residual-Learning" class="headerlink" title="3.Deep Residual Learning"></a>3.Deep Residual Learning</h2><h3 id="3-1Residual-Learning"><a href="#3-1Residual-Learning" class="headerlink" title="3.1Residual Learning"></a>3.1Residual Learning</h3><h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><p>torch.nn<br>nn.Conv2d<br>nn.BatchNorm2d</p>
+]]></content>
+      <categories>
+        <category>论文解析</category>
+      </categories>
+      <tags>
+        <tag>Deep Learning</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>之前的博客</title>
     <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>hexo使用教程</title>
+    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
+<p>2.hexo g 重新生成博客</p>
+<p>3.hexo s 本地运行</p>
+<p>4.hexo clean 清除缓存</p>
+<p>5.hexo d 上传到github仓库</p>
+]]></content>
+      <categories>
+        <category>hexo使用教程</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
   </entry>
   <entry>
     <title>单调队列</title>
@@ -256,19 +272,17 @@
       </tags>
   </entry>
   <entry>
-    <title>hexo使用教程</title>
-    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
-<p>2.hexo g 重新生成博客</p>
-<p>3.hexo s 本地运行</p>
-<p>4.hexo clean 清除缓存</p>
-<p>5.hexo d 上传到github仓库</p>
+    <title>堆排序及优先队列</title>
+    <url>/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/</url>
+    <content><![CDATA[<h1 id="准备知识"><a href="#准备知识" class="headerlink" title="准备知识"></a>准备知识</h1><h2 id="1-大根堆和小根堆"><a href="#1-大根堆和小根堆" class="headerlink" title="1.大根堆和小根堆"></a>1.大根堆和小根堆</h2><blockquote>
+<p>性质：每个结点的值都大于其左孩子和右孩子结点的值，称之为大根堆；每个结点的值都小于其左孩子和右孩子结点的值，称之为小根堆。<br><img src="/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/2022-03-07-22-44-45.png" alt></p>
+</blockquote>
 ]]></content>
       <categories>
-        <category>hexo使用教程</category>
+        <category>算法</category>
       </categories>
       <tags>
-        <tag>hexo</tag>
+        <tag>算法</tag>
       </tags>
   </entry>
   <entry>
