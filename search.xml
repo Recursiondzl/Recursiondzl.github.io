@@ -1,300 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>LSTR论文解析</title>
-    <url>/2022/03/04/LSTR%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<blockquote>
-<p>论文链接：<a href="https://arxiv.org/pdf/2011.04233.pdf">https://arxiv.org/pdf/2011.04233.pdf</a><br>论文出处：WACV2020<br>论文代码：<a href="https://github.com/liuruijin17/LSTR">https://github.com/liuruijin17/LSTR</a></p>
-</blockquote>
-<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><ul>
-<li><p><strong>车道线检测是将车道识别为近似曲线的过程。</strong></p>
-</li>
-<li><p><strong>主流的pipeline是分成2步解决问题：特征提取和后处理。虽然有用，但效率低下。</strong></p>
-</li>
-<li><p><strong>本文提出了一种端到端方法，该方法可以直接输出车道形状模型的参数</strong>，使用通过transformer构建的网络来学习更丰富的结构和上下文。</p>
-</li>
-<li><p>车道形状模型是基于道路结构和摄像头姿势制定的，可为网络输出的参数提供物理解释。</p>
-</li>
-<li><p>transformer使用自我注意机制（self-attention mechanism）对非局部交互进行建模，以捕获细长的结构和全局上下文。</p>
-</li>
-<li><p>该方法已在TuSimple基准测试中得到验证，并以最轻巧的模型尺寸和最快的速度显示了最新的准确性。</p>
-</li>
-</ul>
-<h1 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h1><ul>
-<li><p><strong>车道检测实际应用中challenges：（1）车道标线是一个细长的结构，外观线索很少（2）车道标记类型不同、光线变化以及车辆和行人的遮挡（3）算法的高运行效率和传输适应性对于在移动设备上部署</strong></p>
-</li>
-<li><p><strong>早期方法：先分割车道线，再做聚合（segment clustering），再做曲线拟合。</strong></p>
-</li>
-<li><p><strong>一些方法使用消息传递或额外的场景注释来捕获全局上下文，以提高最终性能，但这些方法不可避免地会消耗更多的时间和数据成本。</strong></p>
-</li>
-<li><p><strong>缺点：这些方法效率低，且做车道线分割时忽略全局上下文信息（global context）</strong></p>
-</li>
-<li><p>为了解决效率和车道线结构的问题，建议将<strong>车道检测输出重构为车道形状模型的参数</strong>（parameters of a lane shape model），并开发一个<strong>由非局部构件（non-local building blocks）</strong>构建的网络，<strong>以加强对全局上下文信息和车道细长结构的学习。</strong></p>
-</li>
-<li><p><strong>每个车道的输出是一组参数</strong>，这些参数通过从道路结构和摄像机姿态推导出的显式<strong>数学公式近似于车道标记</strong>。在给定摄像机固有参数等特定先验条件下，无需任何3D传感器，<strong>这些参数就可以用于计算道路曲率和摄像机俯仰角。</strong></p>
-</li>
-<li><p>开发了一个<strong>基于transformer的网络</strong>，该网络从任何成对的视觉特征中总结信息，使其能够捕获车道线的狭长结构和全局上下文信息（ global context）。<br><strong>整个体系结构立即预测输出</strong>，并<strong>采用匈牙利损失（Hungarian loss）进行端到端训练</strong>。<br>损失模型采用预测与真值之间的双边匹配（ bipartite matching），保证一对一的无序分配，<strong>使模型消除了显性的非极大抑制过程。</strong></p>
-</li>
-<li><p>在常规的多车道检测基准TuSimple上验证了该方法的有效性。</p>
-</li>
-<li><p>为了评估对新场景的适应性，我们在多个城市收集了大量具有挑战性的数据集，称为前视车道(FVL)，跨越各种场景(城市和高速公路、白天和夜晚、各种交通和天气条件)。该方法在复杂数据集不包含夜景等场景的情况下，对新场景具有较强的适应性。</p>
-</li>
-<li><p>本文主要贡献：<br>（1）<strong>提出了一种车道形状模型，其参数作为直接回归输出，反映道路结构和摄像机姿态。</strong><br>（2）开发了一个<strong>基于transformer的网络</strong>，该网络考虑了非局部的相互作用，<strong>以捕获车道和全局上下文的细长结构。</strong><br>（3）<strong>本文方法以最少的资源消耗达到了最先进的精度，并对具有挑战性的自采集车道检测数据集显示了良好的适应性。</strong></p>
-</li>
-</ul>
-<h1 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h1><p>  <del>参数有现实意义</del></p>
-<h1 id="3-Method"><a href="#3-Method" class="headerlink" title="3.Method"></a>3.Method</h1><p><strong>本文端到端方法重构输出为车道形状模型的参数。通过基于transformer的网络with匈牙利拟合损失对参数进行预测。</strong></p>
-<h2 id="3-1车道形状模型（Lane-Shape-Model）"><a href="#3-1车道形状模型（Lane-Shape-Model）" class="headerlink" title="3.1车道形状模型（Lane Shape Model）"></a>3.1车道形状模型（Lane Shape Model）</h2><ul>
-<li>车道形状的先验模型被定义为多项式。通常，<strong>三次曲线</strong>用来近似平地上的单车道线：(1)<br>其中k，m，n，b是实数参数，(X，Z)表示地平面的点。</li>
-<li>当光轴平行于地平面时，从道路屏幕投影到图像平面的曲线为：(2)</li>
-<li>对于一个倾斜相机的光轴与地平面成φ角时，从不倾斜的图像平面到倾斜的图像平面的曲线转换为：(3)</li>
-<li>其中 f 是焦距，(u’， v’)是倾角转换的点位置，当 φ = 0，公式（3）简化成公式（2）。</li>
-</ul>
-<p>曲线的重新参数化Curve re-parameterization<br>将参数与俯仰角φ相结合，倾斜摄像机平面的曲线为:(4)</p>
-<p>此外，还引入了垂直起止偏移量α、β来参数化各车道线。这两个参数提供了基本的定位信息来描述车道线的上下边界。</p>
-<ul>
-<li>在真实的道路条件下，车道通常具有全局一致的形状。因此，近似圆弧从左到右车道的曲率相等，因此k′′,f′′,m′′,n′将被所有车道共享。因此，t-th车道的输出被重新参数化为gt：(5)<br>其中 t∈{1,…,T}，T 是图像中车道线的数量，每个车道仅在偏差项和上下边界上有所不同。</li>
-</ul>
-<h2 id="3-2-匈牙利拟合损失（Hungarian-Fitting-Loss）"><a href="#3-2-匈牙利拟合损失（Hungarian-Fitting-Loss）" class="headerlink" title="3.2 匈牙利拟合损失（Hungarian Fitting Loss）"></a>3.2 匈牙利拟合损失（Hungarian Fitting Loss）</h2><ul>
-<li>匈牙利拟合损失在预测参数和车道真值之间进行匹配，采用匈牙利算法有效地解决了匹配问题，然后利用匹配结果优化路径相关回归损失。</li>
-<li>损失模型采用预测与真值之间的双边匹配（ bipartite matching）。</li>
-</ul>
-<h2 id="3-3-网络结构"><a href="#3-3-网络结构" class="headerlink" title="3.3 网络结构"></a>3.3 网络结构</h2><p><strong>一个主干（backbone）、一个简化transformer网络、几个用于参数预测的前馈网络(FFNs)和匈牙利损失。</strong><br><img src="/2022/03/04/LSTR%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-04-20-06-32.png" alt></p>
-<ul>
-<li>给定输入图像 I，主干提取低分辨率特征，然后通过压缩空间维度将其压缩成一个序列 S。S和位置嵌入 Ep 馈入transformer， Encoder以输出表示序列 Se。</li>
-<li>然后，Decoder首先处理一个初始查询序列 Sq 和一个隐式学习位置差异的学习位置嵌入 ELL 生成输出序列 Sd，计算与 Se 和 Ep 的交互以处理相关特征。</li>
-<li><p>最后，有几种FFNs直接对所提出的输出参数进行预测。</p>
-</li>
-<li><p>主干是建立在reduced ResNet18的基础上。原ResNet18有4个block和16倍下采样功能。每个块的输出通道为“64、128、256、512”。</p>
-</li>
-<li>本文简化 ResNet18将输出通道削减为“16、32、64、128”以避免过拟合，并将降采样因子设置为8以减少车道结构细节的损失。</li>
-<li>Backbone利用输入图像作为输入，提取低分辨率特征，对高分辨率车道空间表示进行编码。</li>
-<li>接下来，为了构造一个作为编码器输入的序列，将该特征在空间维度上进行平铺，得到一个长度为HW×C的序列S，其中HW表示序列的长度，C为信道数。</li>
-</ul>
-<h2 id="3-4Encoder"><a href="#3-4Encoder" class="headerlink" title="3.4Encoder"></a>3.4Encoder</h2><p>编码器有两个按顺序链接的标准层。它们分别由一个自注意模块和一个前馈层组成，如图2所示。在抽象空间表示序列S的基础上，利用基于绝对位置的正体嵌入Ep对位置信息进行编码，以避免排列变化。该Ep具有与s相同的尺寸。编码器通过下式执行缩放点积注意.</p>
-<p>其中Q,K,V表示对每个输入行进行线性变换的查询、键和值序列，a表示度量非局部交互以捕获纤细结构和全局上下文的注意力映射，O表示自注意的输出。HW×C形状的编码器Se的输出序列是通过FNNs、层归一化的residual连接和另一个相同的编码器层得到的。</p>
-<h2 id="3-5-Decoder"><a href="#3-5-Decoder" class="headerlink" title="3.5 Decoder"></a>3.5 Decoder</h2><p>解码器也有两个标准层。与编码器不同的是，每一层都插入另一个注意模块，该模块期望编码器的输出，使编码器能够对包含空间信息的特征执行注意机制，从而与最相关的特征元素相关联。面对翻译任务，原转换器将地真序列移位一个位置，作为译码器的输入，使其每次并行输出序列中的每个元素。在车道检测任务中，我们将输入的Sq设置为一个空的N×C矩阵，并直接一次解码所有的曲线参数。<br>此外，我们引入了一种N×C的学习车道嵌入算法，作为隐式学习全局车道信息的位置嵌入。注意机制与公式9相同，解码后的N×C形状的序列Sd与编码方法相似。训练时，在每一解码层之后进行中间监督。</p>
-<p>FFNs用于预测曲线参数<br>预测模块通过三部分生成预测曲线H集合。单个线性操作直接将Sd投射为N×2，然后softmax层对其进行最后维运算，得到预测标签(background或lane)ci,i∈{1，…，N}。<br>同时，一个具有ReLU激活和隐C维的3层感知器将Sd投射为N×4，其中维4表示四组特定路径参数。另一个3层感知器首先将一个特征投影到N×4，然后在第一维取平均值，得到4个共享参数。</p>
-<h1 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h1><p>针对形状模型的对比</p>
-<p>编码器层数的对比（Number of encoder layers）</p>
-<p>解码器层数的对比（Number of decoder layers）</p>
-<p>预测曲线数量的对比（Number of predicted curves）、</p>
-<h2 id="4-1FVL-Dataset上的迁移测试"><a href="#4-1FVL-Dataset上的迁移测试" class="headerlink" title="4.1FVL Dataset上的迁移测试"></a>4.1FVL Dataset上的迁移测试</h2><p>并没有在FVL数据集上训练。</p>
-<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5.结论"></a>5.结论</h1><p>Future work：<br>（1）研究复杂、细微的车道线检测任务；<br>（2）引入跟踪功能。</p>
-]]></content>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Markdown教程</title>
-    <url>/2022/03/03/Markdown%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<p><meta name="referrer" content="no-referrer"></p>
-<h1 id="‘-’表示标题"><a href="#‘-’表示标题" class="headerlink" title="‘#’表示标题"></a>‘#’表示标题</h1><h2 id="‘-’表示二级标题"><a href="#‘-’表示二级标题" class="headerlink" title="‘##’表示二级标题"></a>‘##’表示二级标题</h2><pre><code>正文直接写
-
-加粗前后用**或者control+B
-**强调**
-
-用一个*变斜或者control+I
-*变斜*
-
-1. 有序列表1.+空格
-   1. tab添加二级列表
-2. 二级列表
-
-插入图片：
-1. 复制图片
-2. control+Alt+v
-*orz*
-</code></pre><h3 id="‘-’表示三级标题"><a href="#‘-’表示三级标题" class="headerlink" title="‘###’表示三级标题"></a>‘###’表示三级标题</h3><pre><code>&quot;$$&quot;中间可以用Latex&quot;$$&quot;
-</code></pre><script type="math/tex; mode=display">
-\lim_{x \to \infin}\frac{sin(t)}{x}=1</script><h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><div class="table-container">
-<table>
-<thead>
-<tr>
-<th>1</th>
-<th style="text-align:center">2</th>
-<th>3</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>control+c<br>contron+v<br><a href="https://recursiondzl.github.io/">https://recursiondzl.github.io/</a></p>
-<h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-07-34.png" alt><br><figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure></p>
-<h2 id="视频教程"><a href="#视频教程" class="headerlink" title="视频教程"></a>视频教程</h2><p><a href="https://www.bilibili.com/video/BV1si4y1472o">https://www.bilibili.com/video/BV1si4y1472o</a></p>
-<h2 id="关于图片不显示的问题："><a href="#关于图片不显示的问题：" class="headerlink" title="关于图片不显示的问题："></a>关于图片不显示的问题：</h2><p><a href="https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0</a></p>
-<p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-11-03-04.png" alt></p>
-<hr>
-<h1 id="2022-3-4-Version-2-0"><a href="#2022-3-4-Version-2-0" class="headerlink" title="2022.3.4 Version 2.0"></a>2022.3.4 Version 2.0</h1><h2 id="1-快捷键"><a href="#1-快捷键" class="headerlink" title="1.快捷键"></a>1.快捷键</h2><p>功能        快捷键<br>加粗        Ctrl + B<br>斜体        Ctrl + I<br>引用        Ctrl + Q<br>插入链接    Ctrl + L<br>插入代码    Ctrl + K<br>插入图片    Ctrl + G<br>提升标题    Ctrl + H<br>有序列表    Ctrl + O<br>无序列表    Ctrl + U<br>横线        Ctrl + R<br>撤销        Ctrl + Z<br>重做        Ctrl + Y</p>
-<h2 id="2-字体设置斜体、粗体、删除线"><a href="#2-字体设置斜体、粗体、删除线" class="headerlink" title="2.字体设置斜体、粗体、删除线"></a>2.字体设置斜体、粗体、删除线</h2><p><em>这里是文字</em><br>_这里是文字_<br><strong>这里是文字</strong><br><strong><em>这里是文字</em></strong><br><del>这里是文字</del><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-05-28.png" alt></p>
-<h2 id="3-分割线"><a href="#3-分割线" class="headerlink" title="3.分割线"></a>3.分割线</h2><p>你可以在一行中用三个以上的星号(*)、减号(-)、底线(_)来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。</p>
-<h2 id="4-引用"><a href="#4-引用" class="headerlink" title="4.引用"></a>4.引用</h2><p>在被引用的文本前加上&gt;符号，以及一个空格就可以了，如果只输入了一个&gt;符号会产生一个空白的引用。</p>
-<blockquote>
-<p>好耶</p>
-</blockquote>
-<h2 id="5-引用的嵌套使用"><a href="#5-引用的嵌套使用" class="headerlink" title="5.引用的嵌套使用"></a>5.引用的嵌套使用</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-09-51.png" alt></p>
-<p><del>看教程看到一半发现有更好的教程，上面也懒得删了</del></p>
-<p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-22.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-56.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-33.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-58.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-30-16.png" alt></p>
-]]></content>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Vit论文解析</title>
+      <link href="/2022/03/09/Vit%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/"/>
+      <url>/2022/03/09/Vit%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<h1 id="ABSTRACT"><a href="#ABSTRACT" class="headerlink" title="ABSTRACT"></a>ABSTRACT</h1><blockquote><p>直接应用于图像块序列  (sequences of image patches) 的纯 Transformer 可以很好地执行 图像分类 任务。当对大量数据进行预训练并迁移到多个中小型图像识别基准时 (ImageNet、CIFAR-100、VTAB 等)，与 SOTA 的 CNN 相比，Vision Transformer (ViT) 可获得更优异的结果，同时仅需更少的训练资源。</p></blockquote><h1 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h1><blockquote><p> <strong>将图像拆分为块 (patch)，并将这些图像块的线性嵌入序列作为 Transformer 的输入。图像块 image patches 的处理方式与 NLP 应用中的标记 tokens (单词 words) 相同。</strong>我们以有监督方式训练图像分类模型。</p><p> 没有强正则化的中型数据集（如 ImageNet）上进行训练时Transformers 缺乏 CNN 固有的一些归纳偏置 (inductive biases)，例如平移等效性和局部性 (translation equivariance and locality)，因此在数据量不足的情况下训练时不能很好地泛化。 </p><p>我们发现 大规模训练胜过归纳偏置。我们的 Vision Transformer (ViT) 在以足够的规模进行预训练并迁移到具有较少数据点的任务时获得了出色结果。</p></blockquote><h1 id="2-RELATED-WORK"><a href="#2-RELATED-WORK" class="headerlink" title="2.RELATED WORK"></a>2.RELATED WORK</h1><blockquote><p>与我们最相关的是 Cordonnier 等人的模型，该模型从输入图像中提取 2×2 大小的块，并在顶部应用完全的自注意力。该模型与ViT 非常相似，但我们的工作进一步证明了 大规模的预训练使普通的 Transformers 能够与 SOTA 的 CNNs 竞争 (甚至更优)。此外，Cordonnier 等人使用 2×2 像素的小块，使模型只适用于小分辨率图像，而我们也能处理中分辨率图像。</p></blockquote><h1 id="3-METHOD"><a href="#3-METHOD" class="headerlink" title="3. METHOD"></a>3. METHOD</h1><h2 id="3-1图像块嵌入-Patch-Embeddings"><a href="#3-1图像块嵌入-Patch-Embeddings" class="headerlink" title="3.1图像块嵌入 (Patch Embeddings)"></a>3.1图像块嵌入 (Patch Embeddings)</h2><p>标准 Transformer 接受 一维标记嵌入序列 (<strong>Sequence of token embeddings</strong>) 作为输入</p><p><img src="/2022/03/09/Vit%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-09-20-54-22.png" alt></p><h1 id="3-2-可学习的嵌入-Learnable-Embedding"><a href="#3-2-可学习的嵌入-Learnable-Embedding" class="headerlink" title="3.2 可学习的嵌入 (Learnable Embedding)"></a>3.2 可学习的嵌入 (Learnable Embedding)</h1><p><img src="/2022/03/09/Vit%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-09-20-59-35.png" alt><br>与 BERT 的 [class] token 类似，研究者在一系列嵌入 patch （z_0^0 = x_class）之前预先添加了一个可学习嵌入，它在 Transformer 编码器（z_0^L ）输出中的状态可以作为图像表示 y（公式 4）。在预训练和微调阶段，分类头（head）依附于 z_L^0。</p><p>位置嵌入被添加到 patch 嵌入中以保留位置信息。研究者尝试了位置嵌入的不同 2D 感知变体，但与标准 1D 位置嵌入相比并没有显著的增益。所以，编码器以联合嵌入为输入。</p><p>Transformer 编码器由多个交互层的多头自注意力（MSA）和 MLP 块组成（公式 2、3）。每个块之前应用 Layernorm（LN），而残差连接在每个块之后应用。MLP 包含两个呈现 GELU 非线性的层。</p><p><img src="/2022/03/09/Vit%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-09-21-01-47.png" alt></p><h1 id="3-4Transformer-编码器"><a href="#3-4Transformer-编码器" class="headerlink" title="3.4Transformer 编码器"></a>3.4Transformer 编码器</h1><p> Transformer 编码器 由交替的 多头自注意力层 (MSA, 附录 A) 和 多层感知机块 (MLP, 等式 2, 3) 构成。在每个块前应用 层归一化 (Layer Norm)，在每个块后应用 残差连接 (Residual Connection)。</p><h1 id="3-6-归纳偏置与混合架构"><a href="#3-6-归纳偏置与混合架构" class="headerlink" title="3.6 归纳偏置与混合架构"></a>3.6 归纳偏置与混合架构</h1><p>该研究进行了大量实验，并使用了多个 ViT 模型变体，参见下表</p><p>研究者首先将最大的 ViT 模型（在 JFT-300M 数据集上预训练的 ViT-H/14 和 ViT-L/16）与 SOTA CNN 模型进行对比，结果参见下表 2。</p><p>3.3 预训练数据要求</p><p>Vision Transformer 在大型 JFT-300M 数据集上进行预训练后表现出了优秀的性能。在 ViT 的归纳偏置少于 ResNet 的情况下，数据集规模的重要性几何呢？该研究进行了一些实验。</p><p>首先，在规模逐渐增加的数据集（ImageNet、ImageNet-21k 和 JFT300M）上预训练 ViT 模型。下图 3 展示了模型在 ImageNet 数据集上的性能：</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Deep learning </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>堆排序及优先队列</title>
+      <link href="/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/"/>
+      <url>/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/</url>
+      
+        <content type="html"><![CDATA[<h1 id="准备知识"><a href="#准备知识" class="headerlink" title="准备知识"></a>准备知识</h1><h2 id="1-大根堆和小根堆"><a href="#1-大根堆和小根堆" class="headerlink" title="1.大根堆和小根堆"></a>1.大根堆和小根堆</h2><blockquote><p>性质：每个结点的值都大于其左孩子和右孩子结点的值，称之为大根堆；每个结点的值都小于其左孩子和右孩子结点的值，称之为小根堆。</p></blockquote><p><img src="/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/2022-03-07-22-44-45.png" alt></p><p><img src="/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/2022-03-07-22-47-06.png" alt></p><p>1.父结点索引：(i-1)/2（这里计算机中的除以2，省略掉小数）</p><p>2.左孩子索引：2*i+1</p><p>3.右孩子索引：2*i+2</p><p>所以上面两个数组可以脑补成堆结构，因为他们满足堆的定义性质：</p><p>大根堆：arr(i)&gt;arr(2<em>i+1) &amp;&amp; arr(i)&gt;arr(2</em>i+2)</p><p>小根堆：arr(i)&lt;arr(2<em>i+1) &amp;&amp; arr(i)&lt;arr(2</em>i+2)</p><h2 id="堆排序基本步骤"><a href="#堆排序基本步骤" class="headerlink" title="堆排序基本步骤"></a>堆排序基本步骤</h2><h1 id="优先队列"><a href="#优先队列" class="headerlink" title="优先队列"></a>优先队列</h1><p>既然是队列那么先要包含头文件#include <queue>, 他和queue不同的就在于我们可以自定义其中数据的优先级, 让优先级高的排在队列前面,优先出队</queue></p><p>优先队列具有队列的所有特性，包括基本操作，只是在这基础上添加了内部的一个排序，它本质是一个堆实现的</p><p>和队列基本操作相同:</p><blockquote><p>top 访问队头元素<br>empty 队列是否为空<br>size 返回队列内元素个数<br>push 插入元素到队尾 (并排序)<br>emplace 原地构造一个元素并插入队列<br>pop 弹出队头元素<br>swap 交换内容</p></blockquote><p><strong>定义：priority_queue<Type, container, functional></Type,></strong><br><strong>Type 就是数据类型，Container 就是容器类型（Container必须是用数组实现的容器，比如vector,deque等等，但不能用 list。STL里面默认用的是vector），Functional 就是比较的方式，当需要用自定义的数据类型时才需要传入这三个参数，使用基本数据类型时，只需要传入数据类型，默认是大顶堆</strong></p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//升序队列</span><br>priority_queue &lt;<span class="hljs-type">int</span>,vector&lt;<span class="hljs-type">int</span>&gt;,greater&lt;<span class="hljs-type">int</span>&gt; &gt; q;<br><span class="hljs-comment">//降序队列</span><br>priority_queue &lt;<span class="hljs-type">int</span>,vector&lt;<span class="hljs-type">int</span>&gt;,less&lt;<span class="hljs-type">int</span>&gt; &gt;q;<br><br><span class="hljs-comment">//greater和less是std实现的两个仿函数（就是使一个类的使用看上去像一个函数。其实现就是类中实现一个operator()，这个类就有了类似函数的行为，就是一个仿函数类了）</span><br> <span class="hljs-comment">//对于基础类型 默认是大顶堆</span><br>priority_queue&lt;<span class="hljs-type">int</span>&gt; a; <br><span class="hljs-comment">//等同于 priority_queue&lt;int, vector&lt;int&gt;, less&lt;int&gt; &gt; a;</span><br></code></pre></td></tr></table></figure><h2 id="对于自定义类型"><a href="#对于自定义类型" class="headerlink" title="对于自定义类型"></a>对于自定义类型</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">//方法1</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">tmp1</span> <span class="hljs-comment">//运算符重载&lt;</span><br>&#123;<br>    <span class="hljs-type">int</span> x;<br>    <span class="hljs-built_in">tmp1</span>(<span class="hljs-type">int</span> a) &#123;x = a;&#125;<br>    <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-type">const</span> tmp1&amp; a) <span class="hljs-type">const</span><br>    &#123;<br>        <span class="hljs-keyword">return</span> x &lt; a.x; <span class="hljs-comment">//大顶堆</span><br>    &#125;<br>&#125;;<br><br><span class="hljs-comment">//方法2</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">tmp2</span> <span class="hljs-comment">//重写仿函数</span><br>&#123;<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span> <span class="hljs-params">(tmp1 a, tmp1 b)</span> </span><br><span class="hljs-function">    </span>&#123;<br>        <span class="hljs-keyword">return</span> a.x &lt; b.x; <span class="hljs-comment">//大顶堆</span><br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><h2 id="例题：合并果子"><a href="#例题：合并果子" class="headerlink" title="例题：合并果子"></a>例题：合并果子</h2><p><a href="https://www.luogu.com.cn/problem/P1090">https://www.luogu.com.cn/problem/P1090</a><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * @Description: To iterate is human, to recurse divine.</span><br><span class="hljs-comment"> * @Autor: Recursion</span><br><span class="hljs-comment"> * @Date: 2022-03-07 23:00:52</span><br><span class="hljs-comment"> * @LastEditTime: 2022-03-07 23:10:39</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-type">int</span> n,ans=<span class="hljs-number">0</span>;<br>priority_queue&lt;<span class="hljs-type">int</span>,vector&lt;<span class="hljs-type">int</span>&gt;,greater&lt;<span class="hljs-type">int</span>&gt;&gt; a;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span>(cin&gt;&gt;n)&#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;n;i++)&#123;<br>            <span class="hljs-type">int</span> x;<br>            cin&gt;&gt;x;<br>            a.<span class="hljs-built_in">push</span>(x);<br>        &#125;<br>        <span class="hljs-keyword">while</span>(!a.<span class="hljs-built_in">empty</span>())&#123;<br>            <span class="hljs-keyword">if</span>(a.<span class="hljs-built_in">size</span>()==<span class="hljs-number">1</span>)<br>                <span class="hljs-keyword">break</span>;<br>            <span class="hljs-type">int</span> temp=<span class="hljs-number">0</span>;<br>            temp=temp+a.<span class="hljs-built_in">top</span>();<br>            a.<span class="hljs-built_in">pop</span>();<br>            temp=temp+a.<span class="hljs-built_in">top</span>();<br>            a.<span class="hljs-built_in">pop</span>();<br>            ans+=temp;<br>            a.<span class="hljs-built_in">push</span>(temp);<br>        &#125;<br>        cout&lt;&lt;ans&lt;&lt;endl;<br><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></p>]]></content>
+      
+      
       <categories>
-        <category>Markdawn教程</category>
+          
+          <category> 算法 </category>
+          
       </categories>
-      <tags>
-        <tag>Markdown</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Transform解析</title>
-    <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p>
-<h2 id="2-Encoder-Decoder结构原理"><a href="#2-Encoder-Decoder结构原理" class="headerlink" title="2.Encoder-Decoder结构原理"></a>2.Encoder-Decoder结构原理</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-09-48.png" alt></p>
-<h1 id="Transformer-原理"><a href="#Transformer-原理" class="headerlink" title="Transformer 原理"></a>Transformer 原理</h1><h2 id="1-Transformer整体结构"><a href="#1-Transformer整体结构" class="headerlink" title="1.Transformer整体结构"></a>1.Transformer整体结构</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-14-17.png" alt></p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-15-32.png" alt></p>
-<h2 id="2-Transformer的Encoder"><a href="#2-Transformer的Encoder" class="headerlink" title="2.Transformer的Encoder"></a>2.Transformer的Encoder</h2><p>  Encoder block是由6个encoder堆叠而成，Nx=6。从图中我们可以看出一个encoder由Multi-Head Attention 和 全连接神经网络Feed Forward Network构成。</p>
-<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-00.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-59.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-22-33.png" alt></p>
-<h1 id="视频讲解"><a href="#视频讲解" class="headerlink" title="视频讲解"></a>视频讲解</h1><p>  <a href="https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0</a></p>
-<p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-26-28.png" alt></p>
-<h2 id="1-内部结构"><a href="#1-内部结构" class="headerlink" title="1.内部结构"></a>1.内部结构</h2><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-27-29.png" alt></p>
-<p><strong>六个Encoder结构相同但参数不同，Decode也是一样的道理</strong></p>
-<h2 id="3-位置编码"><a href="#3-位置编码" class="headerlink" title="3.位置编码"></a>3.位置编码</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-35-56.png" alt><br>  2i位置用sin,2i+1位置用cos</p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-39-12.png" alt><br>   位置相加<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-40-21.png" alt> </p>
-<h2 id="4-注意力机制"><a href="#4-注意力机制" class="headerlink" title="4.注意力机制"></a>4.注意力机制</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-43-59.png" alt><br>  Q K V为三个矩阵<br>  归一化后乘以V矩阵</p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-45-57.png" alt><br>  Query 和 Key 点乘(反应向量相似度，结果越大越相似)<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-49-20.png" alt></p>
-<h3 id="4-1如何获取QKV"><a href="#4-1如何获取QKV" class="headerlink" title="4.1如何获取QKV"></a>4.1如何获取QKV</h3><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-51-23.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-53-25.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-54-32.png" alt></p>
-<p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-55-22.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-56-59.png" alt><br>多头注意力机制，使用多套WQ WK WV矩阵，最后合在一起输出</p>
-<h2 id="5-残差"><a href="#5-残差" class="headerlink" title="5.残差"></a>5.残差</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-59-13.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-01-27.png" alt></p>
-<h2 id="6-Layernormal"><a href="#6-Layernormal" class="headerlink" title="6.Layernormal"></a>6.Layernormal</h2><pre><code>BN与LN的区别在于：
-</code></pre><p>  LN中同层神经元输入拥有相同的均值和方差，不同的输入样本有不同的均值和方差；<br>  BN中则针对不同神经元输入计算均值和方差，同一个batch中的输入拥有相同的均值和方差。<br>  所以，LN不依赖于batch的大小和输入sequence的深度，因此可以用于batchsize为1和RNN中对边长的输入sequence的normalize操作。</p>
-<h2 id="7-Feed-Forward"><a href="#7-Feed-Forward" class="headerlink" title="7.Feed-Forward"></a>7.Feed-Forward</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-08-50.png" alt></p>
-<h2 id="8-Decoder"><a href="#8-Decoder" class="headerlink" title="8.Decoder"></a>8.Decoder</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-15-45.png" alt></p>
-<h1 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h1><h2 id="Encoder"><a href="#Encoder" class="headerlink" title="Encoder"></a>Encoder</h2><p>Encoder层中有6个一模一样的层结构，每个层结构包含了两个子层，第一个子层是多头注意力层（Multi-Head Attention,橙色部分），第二个子层是前馈连接层（Feed Forward，浅蓝色部分）。除此之外，还有一个残差连接，直接将input embedding传给第一个Add &amp; Norm层（黄色部分）以及第一个Add &amp; Norm层传给第二个Add &amp; Norm层（即图中的粉色-黄色1，黄色1-黄色2部分运用了残差连接）。</p>
-<h2 id="Decoder"><a href="#Decoder" class="headerlink" title="Decoder"></a>Decoder</h2><p>Decoder层中也有6个一模一样的层结构，但是比Endoer层稍微复杂一点，它有三个子层结构，第一个子层结构是遮掩多头注意力层（Masked Multi-Head Attention，橙色部分），第二个子层是多头注意力结构(Multi-Head Attenion，橙色部分)，第三个子层是前馈连接层（Feed Forward,浅蓝色部分）。<br>Decoder层中也有6个一模一样的层结构，但是比Endoer层稍微复杂一点，它有三个子层结构，第一个子层结构是遮掩多头注意力层（Masked Multi-Head Attention，橙色部分），第二个子层是多头注意力结构(Multi-Head Attenion，橙色部分)，第三个子层是前馈连接层（Feed Forward,浅蓝色部分）。</p>
-<p>说明：</p>
-<p>这一部分的残差连接是粉色-黄色1，黄色1-黄色2，黄色2-黄色3三个部分<br>该层的重点是第二个子层，即多头注意力层，它的输入包括两个部分，第一个部分是第一个子层的输出，第二个部分是Encoder层的输出（这是与encoder层的区别之一），这样则将encoder层和decoder层串联起来，以进行词与词之间的信息交换，这里信息交换是通过共享权重WQ,WV,WK得到的。<br>第一个子层中的mask，它的作用就是防止在训练的时候使用未来的输出的单词。比如训练时，第一个单词是不能参考第二个单词的生成结果的，此时就会将第二个单词及其之后的单词都mask掉。总体来讲，mask的作用就是用来保证预测位置i的信息只能基于比i小的输出。因此，encoder层可以并行计算，一次全部encoding出来，但是decoder层却一定要像RNN一样一个一个解出来，因为要用上一个位置的输入当做attention的query.<br>残差结构是为了解决梯度消失问题，可以增加模型的复杂性。<br>LayerNorm层是为了对attention层的输出进行分布归一化，转换成均值为0方差为1的正态分布。cv中经常会用的是batchNorm，是对一个batchsize中的样本进行一次归一化，而layernorm则是对一层进行一次归一化，二者的作用是一样的，只是针对的维度不同，一般来说输入维度是(batch_size,seq_len,embedding)，batchnorm针对的是batch_size层进行处理，而layernorm则是对seq_len进行处理（即batchnorm是对一批样本中进行归一化，而layernorm是对每一个样本进行一次归一化）。<br>使用ln而不是bn的原因是因为输入序列的长度问题，每一个序列的长度不同，虽然会经过padding处理，但是padding的0值其实是无用信息，实际上有用的信息还是序列信息，而不同序列的长度不同，所以这里不能使用bn一概而论。<br>FFN是两层全连接：w <em> [delta(w </em> x + b)] + b，其中的delta是relu激活函数。这里使用FFN层的原因是：为了使用非线性函数来拟合数据。如果说只是为了非线性拟合的话，其实只用到第一层就可以了，但是这里为什么要用两层全连接呢，是因为第一层的全连接层计算后，其维度是(batch_size,seq_len,dff)（其中dff是超参数的一种，设置为2048），而使用第二层全连接层是为了进行维度变换，将dff转换为初始的d_model(512)维。<br>decoder层中中间的多头自注意力机制的输入是两个参数——encoder层的输出和decoder层中第一层masked多头自注意力机制的输出，作用在本层时是：q=encoder的输出，k=v=decoder的输出。<br>encoder的输入包含两个，是一个序列的token embedding + positional embedding，用正余弦函数对序列中的位置进行计算</p>
-]]></content>
+      
+      
+        <tags>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>单调队列</title>
+      <link href="/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/"/>
+      <url>/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/</url>
+      
+        <content type="html"><![CDATA[<p>部分转载自：<a href="https://zhuanlan.zhihu.com/p/346354943">https://zhuanlan.zhihu.com/p/346354943</a></p><ul><li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。<br><img src="/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/2022-03-07-09-26-00.png" alt></li></ul><ul><li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。</li></ul><p>模板题——滑动窗口：<a href="https://www.luogu.com.cn/problem/P1886">https://www.luogu.com.cn/problem/P1886</a></p><blockquote><p>d.front():返回的一个元素的引用。<br>d.back():返回最后一个元素的引用。<br>d.pop_back():删除尾部的元素。不返回值。<br>d.pop_front()：删除头部元素。不返回值。<br>d.push_back(e):在队尾添加一个元素e。<br>d.push_front(e):在对头添加一个元素e。</p></blockquote><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * @Description: To iterate is human, to recurse divine.</span><br><span class="hljs-comment"> * @Autor: Recursion</span><br><span class="hljs-comment"> * @Date: 2022-03-06 22:36:34</span><br><span class="hljs-comment"> * @LastEditTime: 2022-03-07 09:30:15</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">int</span> n,k,x,m[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-type">int</span> cnt=<span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> maxnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<span class="hljs-comment">//数组用来存答案</span><br><span class="hljs-type">int</span> minnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span><br>&#123;<br>    <span class="hljs-type">int</span> order;<br>    <span class="hljs-type">int</span> value;<br>&#125;;<br><br>deque&lt;node&gt; maxn,minn;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span>(cin&gt;&gt;n&gt;&gt;k)&#123;<br>        node temp;<span class="hljs-comment">//暂时储存</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;i++)&#123;<br>            cin&gt;&gt;x;<br><br>            temp.order=i;<br>            temp.value=x;<span class="hljs-comment">//赋值</span><br>            <br>            <span class="hljs-keyword">while</span>(!maxn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&gt;=maxn.<span class="hljs-built_in">back</span>().value)<br>                maxn.<span class="hljs-built_in">pop_back</span>();<br>            <span class="hljs-keyword">while</span>(!minn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&lt;=minn.<span class="hljs-built_in">back</span>().value)<br>                minn.<span class="hljs-built_in">pop_back</span>();<span class="hljs-comment">//保证队列单调</span><br>                <br>            maxn.<span class="hljs-built_in">push_back</span>(temp);<br>            minn.<span class="hljs-built_in">push_back</span>(temp);<br><br>            <span class="hljs-keyword">while</span>(i-k&gt;=maxn.<span class="hljs-built_in">front</span>().order)<span class="hljs-comment">//剔除不在范围类的</span><br>                maxn.<span class="hljs-built_in">pop_front</span>();<br>            <span class="hljs-keyword">while</span>(i-k&gt;=minn.<span class="hljs-built_in">front</span>().order)<br>                minn.<span class="hljs-built_in">pop_front</span>();<br><br>            <span class="hljs-keyword">if</span>(i&gt;=k)&#123;<br>                maxnn[cnt]=maxn.<span class="hljs-built_in">front</span>().value;<br>                minnn[cnt]=minn.<span class="hljs-built_in">front</span>().value;<br>                cnt++;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;minnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        cout&lt;&lt;endl;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;maxnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)&#123;</span><br>        <span class="hljs-comment">//     int maxx=a[i];</span><br>        <span class="hljs-comment">//     int minn=a[i];</span><br>        <span class="hljs-comment">//     for(int j=i;j&lt;i+k;j++)&#123;</span><br>        <span class="hljs-comment">//         if(a[j]&lt;=minn)</span><br>        <span class="hljs-comment">//             y[i]=a[j];</span><br>        <span class="hljs-comment">//         if(a[j]&gt;=maxx)</span><br>        <span class="hljs-comment">//             x[i]=a[j];</span><br>        <span class="hljs-comment">//     &#125;</span><br>        <span class="hljs-comment">// &#125;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;x[i]&lt;&lt;&quot; &quot;;</span><br>        <span class="hljs-comment">// cout&lt;&lt;endl;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;y[i]&lt;&lt;&quot; &quot;;</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+      
+      
       <categories>
-        <category>论文解析</category>
+          
+          <category> 算法 </category>
+          
       </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/03/03/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>ResNet论文解析</title>
-    <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
-    <content><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul>
-<li><p>最近的证据[40, 43]显示网络深度至关重要</p>
-</li>
-<li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p>
-</li>
-<li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p>
-</li>
-</ul>
-<script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha   随便写的数学公式看看hexo能不能渲染</script><ul>
-<li>1.将期望的底层映射表示为H(x)</li>
-<li>2.堆叠的非线性层拟合另一个映射F(x):=H(x)−x</li>
-<li>3.原始的映射重写为F(x)+x</li>
-</ul>
-<p><img src="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-06-20-29-48.png" alt><em>shortcut connection</em></p>
-<ul>
-<li>1）我们极深的残差网络易于优化，但当深度增加时，对应的“简单”网络（简单堆叠层）表现出更高的训练误差；2）我们的深度残差网络可以从大大增加的深度中轻松获得准确性收益，生成的结果实质上比以前的网络更好。</li>
-</ul>
-<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><h2 id="3-Deep-Residual-Learning"><a href="#3-Deep-Residual-Learning" class="headerlink" title="3.Deep Residual Learning"></a>3.Deep Residual Learning</h2><h3 id="3-1Residual-Learning"><a href="#3-1Residual-Learning" class="headerlink" title="3.1Residual Learning"></a>3.1Residual Learning</h3><h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><p>torch.nn<br>nn.Conv2d<br>nn.BatchNorm2d</p>
-]]></content>
+      
+      
+        <tags>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>ResNet论文解析</title>
+      <link href="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/"/>
+      <url>/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Deep-Residual-Learning-for-Image-Recognition"><a href="#Deep-Residual-Learning-for-Image-Recognition" class="headerlink" title="Deep Residual Learning for Image Recognition"></a>Deep Residual Learning for Image Recognition</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><ul><li><p>最近的证据[40, 43]显示网络深度至关重要</p></li><li><p>梯度消失/爆炸:通过标准初始化[23, 8, 36, 12]和中间标准化层[16]在很大程度上已经解决，这使得数十层的网络能通过具有反向传播的随机梯度下降（SGD）开始收敛。</p></li><li><p>当更深的网络能够开始收敛时，<strong>暴露了一个退化问题</strong>：随着网络深度的增加，准确率达到饱和（这可能并不奇怪）然后迅速下降。<strong>意外的是，这种退化不是由过拟合引起的，并且在适当的深度模型上添加更多的层会导致更高的训练误差，</strong>正如[10, 41]中报告的那样，并且由我们的实验完全证实。图1显示了一个典型的例子。</p></li></ul><script type="math/tex; mode=display">\lim_{x \to 0} \int_{a}^{b} \sqrt[a]{b}=\alpha   随便写的数学公式看看hexo能不能渲染</script><ul><li>1.将期望的底层映射表示为H(x)</li><li>2.堆叠的非线性层拟合另一个映射F(x):=H(x)−x</li><li>3.原始的映射重写为F(x)+x</li></ul><p><img src="/2022/03/06/ResNet%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-06-20-29-48.png" alt><em>shortcut connection</em></p><ul><li>1）我们极深的残差网络易于优化，但当深度增加时，对应的“简单”网络（简单堆叠层）表现出更高的训练误差；2）我们的深度残差网络可以从大大增加的深度中轻松获得准确性收益，生成的结果实质上比以前的网络更好。</li></ul><h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><h2 id="3-Deep-Residual-Learning"><a href="#3-Deep-Residual-Learning" class="headerlink" title="3.Deep Residual Learning"></a>3.Deep Residual Learning</h2><h3 id="3-1Residual-Learning"><a href="#3-1Residual-Learning" class="headerlink" title="3.1Residual Learning"></a>3.1Residual Learning</h3><h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><p>torch.nn<br>nn.Conv2d<br>nn.BatchNorm2d</p>]]></content>
+      
+      
       <categories>
-        <category>论文解析</category>
+          
+          <category> 论文解析 </category>
+          
       </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>之前的博客</title>
-    <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>hexo使用教程</title>
-    <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
-    <content><![CDATA[<p>1.hexo n “title” 新建一个文章</p>
-<p>2.hexo g 重新生成博客</p>
-<p>3.hexo s 本地运行</p>
-<p>4.hexo clean 清除缓存</p>
-<p>5.hexo d 上传到github仓库</p>
-]]></content>
+      
+      
+        <tags>
+            
+            <tag> Deep Learning </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>LSTR论文解析</title>
+      <link href="/2022/03/04/LSTR%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/"/>
+      <url>/2022/03/04/LSTR%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>论文链接：<a href="https://arxiv.org/pdf/2011.04233.pdf">https://arxiv.org/pdf/2011.04233.pdf</a><br>论文出处：WACV2020<br>论文代码：<a href="https://github.com/liuruijin17/LSTR">https://github.com/liuruijin17/LSTR</a></p></blockquote><h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><ul><li><p><strong>车道线检测是将车道识别为近似曲线的过程。</strong></p></li><li><p><strong>主流的pipeline是分成2步解决问题：特征提取和后处理。虽然有用，但效率低下。</strong></p></li><li><p><strong>本文提出了一种端到端方法，该方法可以直接输出车道形状模型的参数</strong>，使用通过transformer构建的网络来学习更丰富的结构和上下文。</p></li><li><p>车道形状模型是基于道路结构和摄像头姿势制定的，可为网络输出的参数提供物理解释。</p></li><li><p>transformer使用自我注意机制（self-attention mechanism）对非局部交互进行建模，以捕获细长的结构和全局上下文。</p></li><li><p>该方法已在TuSimple基准测试中得到验证，并以最轻巧的模型尺寸和最快的速度显示了最新的准确性。</p></li></ul><h1 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h1><ul><li><p><strong>车道检测实际应用中challenges：（1）车道标线是一个细长的结构，外观线索很少（2）车道标记类型不同、光线变化以及车辆和行人的遮挡（3）算法的高运行效率和传输适应性对于在移动设备上部署</strong></p></li><li><p><strong>早期方法：先分割车道线，再做聚合（segment clustering），再做曲线拟合。</strong></p></li><li><p><strong>一些方法使用消息传递或额外的场景注释来捕获全局上下文，以提高最终性能，但这些方法不可避免地会消耗更多的时间和数据成本。</strong></p></li><li><p><strong>缺点：这些方法效率低，且做车道线分割时忽略全局上下文信息（global context）</strong></p></li><li><p>为了解决效率和车道线结构的问题，建议将<strong>车道检测输出重构为车道形状模型的参数</strong>（parameters of a lane shape model），并开发一个<strong>由非局部构件（non-local building blocks）</strong>构建的网络，<strong>以加强对全局上下文信息和车道细长结构的学习。</strong></p></li><li><p><strong>每个车道的输出是一组参数</strong>，这些参数通过从道路结构和摄像机姿态推导出的显式<strong>数学公式近似于车道标记</strong>。在给定摄像机固有参数等特定先验条件下，无需任何3D传感器，<strong>这些参数就可以用于计算道路曲率和摄像机俯仰角。</strong></p></li><li><p>开发了一个<strong>基于transformer的网络</strong>，该网络从任何成对的视觉特征中总结信息，使其能够捕获车道线的狭长结构和全局上下文信息（ global context）。<br><strong>整个体系结构立即预测输出</strong>，并<strong>采用匈牙利损失（Hungarian loss）进行端到端训练</strong>。<br>损失模型采用预测与真值之间的双边匹配（ bipartite matching），保证一对一的无序分配，<strong>使模型消除了显性的非极大抑制过程。</strong></p></li><li><p>在常规的多车道检测基准TuSimple上验证了该方法的有效性。</p></li><li><p>为了评估对新场景的适应性，我们在多个城市收集了大量具有挑战性的数据集，称为前视车道(FVL)，跨越各种场景(城市和高速公路、白天和夜晚、各种交通和天气条件)。该方法在复杂数据集不包含夜景等场景的情况下，对新场景具有较强的适应性。</p></li><li><p>本文主要贡献：<br>（1）<strong>提出了一种车道形状模型，其参数作为直接回归输出，反映道路结构和摄像机姿态。</strong><br>（2）开发了一个<strong>基于transformer的网络</strong>，该网络考虑了非局部的相互作用，<strong>以捕获车道和全局上下文的细长结构。</strong><br>（3）<strong>本文方法以最少的资源消耗达到了最先进的精度，并对具有挑战性的自采集车道检测数据集显示了良好的适应性。</strong></p></li></ul><h1 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h1><p>  <del>参数有现实意义</del></p><h1 id="3-Method"><a href="#3-Method" class="headerlink" title="3.Method"></a>3.Method</h1><p><strong>本文端到端方法重构输出为车道形状模型的参数。通过基于transformer的网络with匈牙利拟合损失对参数进行预测。</strong></p><h2 id="3-1车道形状模型（Lane-Shape-Model）"><a href="#3-1车道形状模型（Lane-Shape-Model）" class="headerlink" title="3.1车道形状模型（Lane Shape Model）"></a>3.1车道形状模型（Lane Shape Model）</h2><ul><li>车道形状的先验模型被定义为多项式。通常，<strong>三次曲线</strong>用来近似平地上的单车道线：(1)<br>其中k，m，n，b是实数参数，(X，Z)表示地平面的点。</li><li>当光轴平行于地平面时，从道路屏幕投影到图像平面的曲线为：(2)</li><li>对于一个倾斜相机的光轴与地平面成φ角时，从不倾斜的图像平面到倾斜的图像平面的曲线转换为：(3)</li><li>其中 f 是焦距，(u’， v’)是倾角转换的点位置，当 φ = 0，公式（3）简化成公式（2）。</li></ul><p>曲线的重新参数化Curve re-parameterization<br>将参数与俯仰角φ相结合，倾斜摄像机平面的曲线为:(4)</p><p>此外，还引入了垂直起止偏移量α、β来参数化各车道线。这两个参数提供了基本的定位信息来描述车道线的上下边界。</p><ul><li>在真实的道路条件下，车道通常具有全局一致的形状。因此，近似圆弧从左到右车道的曲率相等，因此k′′,f′′,m′′,n′将被所有车道共享。因此，t-th车道的输出被重新参数化为gt：(5)<br>其中 t∈{1,…,T}，T 是图像中车道线的数量，每个车道仅在偏差项和上下边界上有所不同。</li></ul><h2 id="3-2-匈牙利拟合损失（Hungarian-Fitting-Loss）"><a href="#3-2-匈牙利拟合损失（Hungarian-Fitting-Loss）" class="headerlink" title="3.2 匈牙利拟合损失（Hungarian Fitting Loss）"></a>3.2 匈牙利拟合损失（Hungarian Fitting Loss）</h2><ul><li>匈牙利拟合损失在预测参数和车道真值之间进行匹配，采用匈牙利算法有效地解决了匹配问题，然后利用匹配结果优化路径相关回归损失。</li><li>损失模型采用预测与真值之间的双边匹配（ bipartite matching）。</li></ul><h2 id="3-3-网络结构"><a href="#3-3-网络结构" class="headerlink" title="3.3 网络结构"></a>3.3 网络结构</h2><p><strong>一个主干（backbone）、一个简化transformer网络、几个用于参数预测的前馈网络(FFNs)和匈牙利损失。</strong><br><img src="/2022/03/04/LSTR%E8%AE%BA%E6%96%87%E8%A7%A3%E6%9E%90/2022-03-04-20-06-32.png" alt></p><ul><li>给定输入图像 I，主干提取低分辨率特征，然后通过压缩空间维度将其压缩成一个序列 S。S和位置嵌入 Ep 馈入transformer， Encoder以输出表示序列 Se。</li><li>然后，Decoder首先处理一个初始查询序列 Sq 和一个隐式学习位置差异的学习位置嵌入 ELL 生成输出序列 Sd，计算与 Se 和 Ep 的交互以处理相关特征。</li><li><p>最后，有几种FFNs直接对所提出的输出参数进行预测。</p></li><li><p>主干是建立在reduced ResNet18的基础上。原ResNet18有4个block和16倍下采样功能。每个块的输出通道为“64、128、256、512”。</p></li><li>本文简化 ResNet18将输出通道削减为“16、32、64、128”以避免过拟合，并将降采样因子设置为8以减少车道结构细节的损失。</li><li>Backbone利用输入图像作为输入，提取低分辨率特征，对高分辨率车道空间表示进行编码。</li><li>接下来，为了构造一个作为编码器输入的序列，将该特征在空间维度上进行平铺，得到一个长度为HW×C的序列S，其中HW表示序列的长度，C为信道数。</li></ul><h2 id="3-4Encoder"><a href="#3-4Encoder" class="headerlink" title="3.4Encoder"></a>3.4Encoder</h2><p>编码器有两个按顺序链接的标准层。它们分别由一个自注意模块和一个前馈层组成，如图2所示。在抽象空间表示序列S的基础上，利用基于绝对位置的正体嵌入Ep对位置信息进行编码，以避免排列变化。该Ep具有与s相同的尺寸。编码器通过下式执行缩放点积注意.</p><p>其中Q,K,V表示对每个输入行进行线性变换的查询、键和值序列，a表示度量非局部交互以捕获纤细结构和全局上下文的注意力映射，O表示自注意的输出。HW×C形状的编码器Se的输出序列是通过FNNs、层归一化的residual连接和另一个相同的编码器层得到的。</p><h2 id="3-5-Decoder"><a href="#3-5-Decoder" class="headerlink" title="3.5 Decoder"></a>3.5 Decoder</h2><p>解码器也有两个标准层。与编码器不同的是，每一层都插入另一个注意模块，该模块期望编码器的输出，使编码器能够对包含空间信息的特征执行注意机制，从而与最相关的特征元素相关联。面对翻译任务，原转换器将地真序列移位一个位置，作为译码器的输入，使其每次并行输出序列中的每个元素。在车道检测任务中，我们将输入的Sq设置为一个空的N×C矩阵，并直接一次解码所有的曲线参数。<br>此外，我们引入了一种N×C的学习车道嵌入算法，作为隐式学习全局车道信息的位置嵌入。注意机制与公式9相同，解码后的N×C形状的序列Sd与编码方法相似。训练时，在每一解码层之后进行中间监督。</p><p>FFNs用于预测曲线参数<br>预测模块通过三部分生成预测曲线H集合。单个线性操作直接将Sd投射为N×2，然后softmax层对其进行最后维运算，得到预测标签(background或lane)ci,i∈{1，…，N}。<br>同时，一个具有ReLU激活和隐C维的3层感知器将Sd投射为N×4，其中维4表示四组特定路径参数。另一个3层感知器首先将一个特征投影到N×4，然后在第一维取平均值，得到4个共享参数。</p><h1 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h1><p>针对形状模型的对比</p><p>编码器层数的对比（Number of encoder layers）</p><p>解码器层数的对比（Number of decoder layers）</p><p>预测曲线数量的对比（Number of predicted curves）、</p><h2 id="4-1FVL-Dataset上的迁移测试"><a href="#4-1FVL-Dataset上的迁移测试" class="headerlink" title="4.1FVL Dataset上的迁移测试"></a>4.1FVL Dataset上的迁移测试</h2><p>并没有在FVL数据集上训练。</p><h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5.结论"></a>5.结论</h1><p>Future work：<br>（1）研究复杂、细微的车道线检测任务；<br>（2）引入跟踪功能。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Deep Learning </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Transform解析</title>
+      <link href="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/"/>
+      <url>/2022/03/04/Transform%E8%A7%A3%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Attention详解"><a href="#Attention详解" class="headerlink" title="Attention详解"></a>Attention详解</h1><h2 id="1-Encoder-Decoder"><a href="#1-Encoder-Decoder" class="headerlink" title="1.Encoder-Decoder"></a>1.Encoder-Decoder</h2><p>在NLP中Encoder-Decoder框架主要被用来处理序列-序列问题。也就是输入一个序列，生成一个序列的问题。这两个序列可以分别是任意长度。具体到NLP中的任务比如：<br>    文本摘要，输入一篇文章(序列数据)，生成文章的摘要(序列数据)<br>    文本翻译，输入一句或一篇英文(序列数据)，生成翻译后的中文(序列数据)<br>    问答系统，输入一个question（序列数据），生成一个answer（序列数据）</p><h2 id="2-Encoder-Decoder结构原理"><a href="#2-Encoder-Decoder结构原理" class="headerlink" title="2.Encoder-Decoder结构原理"></a>2.Encoder-Decoder结构原理</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-09-48.png" alt></p><h1 id="Transformer-原理"><a href="#Transformer-原理" class="headerlink" title="Transformer 原理"></a>Transformer 原理</h1><h2 id="1-Transformer整体结构"><a href="#1-Transformer整体结构" class="headerlink" title="1.Transformer整体结构"></a>1.Transformer整体结构</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-14-17.png" alt></p><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-15-32.png" alt></p><h2 id="2-Transformer的Encoder"><a href="#2-Transformer的Encoder" class="headerlink" title="2.Transformer的Encoder"></a>2.Transformer的Encoder</h2><p>  Encoder block是由6个encoder堆叠而成，Nx=6。从图中我们可以看出一个encoder由Multi-Head Attention 和 全连接神经网络Feed Forward Network构成。</p><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-00.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-21-59.png" alt><br>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-22-33.png" alt></p><h1 id="视频讲解"><a href="#视频讲解" class="headerlink" title="视频讲解"></a>视频讲解</h1><p>  <a href="https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1Di4y1c7Zm?from=search&amp;seid=2664793220430108654&amp;spm_id_from=333.337.0.0</a></p><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-26-28.png" alt></p><h2 id="1-内部结构"><a href="#1-内部结构" class="headerlink" title="1.内部结构"></a>1.内部结构</h2><p>  <img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-27-29.png" alt></p><p><strong>六个Encoder结构相同但参数不同，Decode也是一样的道理</strong></p><h2 id="3-位置编码"><a href="#3-位置编码" class="headerlink" title="3.位置编码"></a>3.位置编码</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-35-56.png" alt><br>  2i位置用sin,2i+1位置用cos</p><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-39-12.png" alt><br>   位置相加<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-40-21.png" alt> </p><h2 id="4-注意力机制"><a href="#4-注意力机制" class="headerlink" title="4.注意力机制"></a>4.注意力机制</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-43-59.png" alt><br>  Q K V为三个矩阵<br>  归一化后乘以V矩阵</p><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-45-57.png" alt><br>  Query 和 Key 点乘(反应向量相似度，结果越大越相似)<br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-49-20.png" alt></p><h3 id="4-1如何获取QKV"><a href="#4-1如何获取QKV" class="headerlink" title="4.1如何获取QKV"></a>4.1如何获取QKV</h3><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-51-23.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-53-25.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-54-32.png" alt></p><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-55-22.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-56-59.png" alt><br>多头注意力机制，使用多套WQ WK WV矩阵，最后合在一起输出</p><h2 id="5-残差"><a href="#5-残差" class="headerlink" title="5.残差"></a>5.残差</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-14-59-13.png" alt><br><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-01-27.png" alt></p><h2 id="6-Layernormal"><a href="#6-Layernormal" class="headerlink" title="6.Layernormal"></a>6.Layernormal</h2><pre><code>BN与LN的区别在于：</code></pre><p>  LN中同层神经元输入拥有相同的均值和方差，不同的输入样本有不同的均值和方差；<br>  BN中则针对不同神经元输入计算均值和方差，同一个batch中的输入拥有相同的均值和方差。<br>  所以，LN不依赖于batch的大小和输入sequence的深度，因此可以用于batchsize为1和RNN中对边长的输入sequence的normalize操作。</p><h2 id="7-Feed-Forward"><a href="#7-Feed-Forward" class="headerlink" title="7.Feed-Forward"></a>7.Feed-Forward</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-08-50.png" alt></p><h2 id="8-Decoder"><a href="#8-Decoder" class="headerlink" title="8.Decoder"></a>8.Decoder</h2><p><img src="/2022/03/04/Transform%E8%A7%A3%E6%9E%90/2022-03-04-15-15-45.png" alt></p><h1 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h1><h2 id="Encoder"><a href="#Encoder" class="headerlink" title="Encoder"></a>Encoder</h2><p>Encoder层中有6个一模一样的层结构，每个层结构包含了两个子层，第一个子层是多头注意力层（Multi-Head Attention,橙色部分），第二个子层是前馈连接层（Feed Forward，浅蓝色部分）。除此之外，还有一个残差连接，直接将input embedding传给第一个Add &amp; Norm层（黄色部分）以及第一个Add &amp; Norm层传给第二个Add &amp; Norm层（即图中的粉色-黄色1，黄色1-黄色2部分运用了残差连接）。</p><h2 id="Decoder"><a href="#Decoder" class="headerlink" title="Decoder"></a>Decoder</h2><p>Decoder层中也有6个一模一样的层结构，但是比Endoer层稍微复杂一点，它有三个子层结构，第一个子层结构是遮掩多头注意力层（Masked Multi-Head Attention，橙色部分），第二个子层是多头注意力结构(Multi-Head Attenion，橙色部分)，第三个子层是前馈连接层（Feed Forward,浅蓝色部分）。<br>Decoder层中也有6个一模一样的层结构，但是比Endoer层稍微复杂一点，它有三个子层结构，第一个子层结构是遮掩多头注意力层（Masked Multi-Head Attention，橙色部分），第二个子层是多头注意力结构(Multi-Head Attenion，橙色部分)，第三个子层是前馈连接层（Feed Forward,浅蓝色部分）。</p><p>说明：</p><p>这一部分的残差连接是粉色-黄色1，黄色1-黄色2，黄色2-黄色3三个部分<br>该层的重点是第二个子层，即多头注意力层，它的输入包括两个部分，第一个部分是第一个子层的输出，第二个部分是Encoder层的输出（这是与encoder层的区别之一），这样则将encoder层和decoder层串联起来，以进行词与词之间的信息交换，这里信息交换是通过共享权重WQ,WV,WK得到的。<br>第一个子层中的mask，它的作用就是防止在训练的时候使用未来的输出的单词。比如训练时，第一个单词是不能参考第二个单词的生成结果的，此时就会将第二个单词及其之后的单词都mask掉。总体来讲，mask的作用就是用来保证预测位置i的信息只能基于比i小的输出。因此，encoder层可以并行计算，一次全部encoding出来，但是decoder层却一定要像RNN一样一个一个解出来，因为要用上一个位置的输入当做attention的query.<br>残差结构是为了解决梯度消失问题，可以增加模型的复杂性。<br>LayerNorm层是为了对attention层的输出进行分布归一化，转换成均值为0方差为1的正态分布。cv中经常会用的是batchNorm，是对一个batchsize中的样本进行一次归一化，而layernorm则是对一层进行一次归一化，二者的作用是一样的，只是针对的维度不同，一般来说输入维度是(batch_size,seq_len,embedding)，batchnorm针对的是batch_size层进行处理，而layernorm则是对seq_len进行处理（即batchnorm是对一批样本中进行归一化，而layernorm是对每一个样本进行一次归一化）。<br>使用ln而不是bn的原因是因为输入序列的长度问题，每一个序列的长度不同，虽然会经过padding处理，但是padding的0值其实是无用信息，实际上有用的信息还是序列信息，而不同序列的长度不同，所以这里不能使用bn一概而论。<br>FFN是两层全连接：w <em> [delta(w </em> x + b)] + b，其中的delta是relu激活函数。这里使用FFN层的原因是：为了使用非线性函数来拟合数据。如果说只是为了非线性拟合的话，其实只用到第一层就可以了，但是这里为什么要用两层全连接呢，是因为第一层的全连接层计算后，其维度是(batch_size,seq_len,dff)（其中dff是超参数的一种，设置为2048），而使用第二层全连接层是为了进行维度变换，将dff转换为初始的d_model(512)维。<br>decoder层中中间的多头自注意力机制的输入是两个参数——encoder层的输出和decoder层中第一层masked多头自注意力机制的输出，作用在本层时是：q=encoder的输出，k=v=decoder的输出。<br>encoder的输入包含两个，是一个序列的token embedding + positional embedding，用正余弦函数对序列中的位置进行计算</p>]]></content>
+      
+      
       <categories>
-        <category>hexo使用教程</category>
+          
+          <category> 论文解析 </category>
+          
       </categories>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>单调队列</title>
-    <url>/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/</url>
-    <content><![CDATA[<p>部分转载自：<a href="https://zhuanlan.zhihu.com/p/346354943">https://zhuanlan.zhihu.com/p/346354943</a></p>
-<ul>
-<li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。<br><img src="/2022/03/07/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/2022-03-07-09-26-00.png" alt></li>
-</ul>
-<ul>
-<li>单调队列的基本思想是，维护一个双向队列（deque），遍历序列，仅当一个元素可能成为某个区间最值时才保留它。</li>
-</ul>
-<p>模板题——滑动窗口：<a href="https://www.luogu.com.cn/problem/P1886">https://www.luogu.com.cn/problem/P1886</a></p>
-<blockquote>
-<p>d.front():返回的一个元素的引用。<br>d.back():返回最后一个元素的引用。<br>d.pop_back():删除尾部的元素。不返回值。<br>d.pop_front()：删除头部元素。不返回值。<br>d.push_back(e):在队尾添加一个元素e。<br>d.push_front(e):在对头添加一个元素e。</p>
-</blockquote>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * @Description: To iterate is human, to recurse divine.</span><br><span class="hljs-comment"> * @Autor: Recursion</span><br><span class="hljs-comment"> * @Date: 2022-03-06 22:36:34</span><br><span class="hljs-comment"> * @LastEditTime: 2022-03-07 09:30:15</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">int</span> n,k,x,m[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-type">int</span> cnt=<span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> maxnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<span class="hljs-comment">//数组用来存答案</span><br><span class="hljs-type">int</span> minnn[(<span class="hljs-type">int</span>)<span class="hljs-number">1e6</span>+<span class="hljs-number">10</span>];<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span><br>&#123;<br>    <span class="hljs-type">int</span> order;<br>    <span class="hljs-type">int</span> value;<br>&#125;;<br><br>deque&lt;node&gt; maxn,minn;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span>(cin&gt;&gt;n&gt;&gt;k)&#123;<br>        node temp;<span class="hljs-comment">//暂时储存</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;i++)&#123;<br>            cin&gt;&gt;x;<br><br>            temp.order=i;<br>            temp.value=x;<span class="hljs-comment">//赋值</span><br>            <br>            <span class="hljs-keyword">while</span>(!maxn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&gt;=maxn.<span class="hljs-built_in">back</span>().value)<br>                maxn.<span class="hljs-built_in">pop_back</span>();<br>            <span class="hljs-keyword">while</span>(!minn.<span class="hljs-built_in">empty</span>()&amp;&amp;x&lt;=minn.<span class="hljs-built_in">back</span>().value)<br>                minn.<span class="hljs-built_in">pop_back</span>();<span class="hljs-comment">//保证队列单调</span><br>                <br>            maxn.<span class="hljs-built_in">push_back</span>(temp);<br>            minn.<span class="hljs-built_in">push_back</span>(temp);<br><br>            <span class="hljs-keyword">while</span>(i-k&gt;=maxn.<span class="hljs-built_in">front</span>().order)<span class="hljs-comment">//剔除不在范围类的</span><br>                maxn.<span class="hljs-built_in">pop_front</span>();<br>            <span class="hljs-keyword">while</span>(i-k&gt;=minn.<span class="hljs-built_in">front</span>().order)<br>                minn.<span class="hljs-built_in">pop_front</span>();<br><br>            <span class="hljs-keyword">if</span>(i&gt;=k)&#123;<br>                maxnn[cnt]=maxn.<span class="hljs-built_in">front</span>().value;<br>                minnn[cnt]=minn.<span class="hljs-built_in">front</span>().value;<br>                cnt++;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;minnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        cout&lt;&lt;endl;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;cnt;i++)<br>            cout&lt;&lt;maxnn[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;<br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)&#123;</span><br>        <span class="hljs-comment">//     int maxx=a[i];</span><br>        <span class="hljs-comment">//     int minn=a[i];</span><br>        <span class="hljs-comment">//     for(int j=i;j&lt;i+k;j++)&#123;</span><br>        <span class="hljs-comment">//         if(a[j]&lt;=minn)</span><br>        <span class="hljs-comment">//             y[i]=a[j];</span><br>        <span class="hljs-comment">//         if(a[j]&gt;=maxx)</span><br>        <span class="hljs-comment">//             x[i]=a[j];</span><br>        <span class="hljs-comment">//     &#125;</span><br>        <span class="hljs-comment">// &#125;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;x[i]&lt;&lt;&quot; &quot;;</span><br>        <span class="hljs-comment">// cout&lt;&lt;endl;</span><br>        <span class="hljs-comment">// for(int i=1;i&lt;=n-k+1;i++)</span><br>        <span class="hljs-comment">//     cout&lt;&lt;y[i]&lt;&lt;&quot; &quot;;</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+      
+      
+        <tags>
+            
+            <tag> Deep Learning </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Markdown教程</title>
+      <link href="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/"/>
+      <url>/2022/03/03/Markdown%E6%95%99%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<p><meta name="referrer" content="no-referrer"></p><h1 id="‘-’表示标题"><a href="#‘-’表示标题" class="headerlink" title="‘#’表示标题"></a>‘#’表示标题</h1><h2 id="‘-’表示二级标题"><a href="#‘-’表示二级标题" class="headerlink" title="‘##’表示二级标题"></a>‘##’表示二级标题</h2><pre><code>正文直接写加粗前后用**或者control+B**强调**用一个*变斜或者control+I*变斜*1. 有序列表1.+空格   1. tab添加二级列表2. 二级列表插入图片：1. 复制图片2. control+Alt+v*orz*</code></pre><h3 id="‘-’表示三级标题"><a href="#‘-’表示三级标题" class="headerlink" title="‘###’表示三级标题"></a>‘###’表示三级标题</h3><pre><code>&quot;$$&quot;中间可以用Latex&quot;$$&quot;</code></pre><script type="math/tex; mode=display">\lim_{x \to \infin}\frac{sin(t)}{x}=1</script><h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><div class="table-container"><table><thead><tr><th>1</th><th style="text-align:center">2</th><th>3</th></tr></thead><tbody><tr><td></td></tr></tbody></table></div><h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><p>control+c<br>contron+v<br><a href="https://recursiondzl.github.io/">https://recursiondzl.github.io/</a></p><h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-07-34.png" alt><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    cout&lt;&lt;<span class="hljs-string">&quot;Hello&quot;</span>&lt;&lt;endl;<br>&#125;<br></code></pre></td></tr></table></figure></p><h2 id="视频教程"><a href="#视频教程" class="headerlink" title="视频教程"></a>视频教程</h2><p><a href="https://www.bilibili.com/video/BV1si4y1472o">https://www.bilibili.com/video/BV1si4y1472o</a></p><h2 id="关于图片不显示的问题："><a href="#关于图片不显示的问题：" class="headerlink" title="关于图片不显示的问题："></a>关于图片不显示的问题：</h2><p><a href="https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0">https://www.bilibili.com/video/BV1D7411U7Yk?from=search&amp;seid=11253000681586254379&amp;spm_id_from=333.337.0.0</a></p><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-11-03-04.png" alt></p><hr><h1 id="2022-3-4-Version-2-0"><a href="#2022-3-4-Version-2-0" class="headerlink" title="2022.3.4 Version 2.0"></a>2022.3.4 Version 2.0</h1><h2 id="1-快捷键"><a href="#1-快捷键" class="headerlink" title="1.快捷键"></a>1.快捷键</h2><p>功能        快捷键<br>加粗        Ctrl + B<br>斜体        Ctrl + I<br>引用        Ctrl + Q<br>插入链接    Ctrl + L<br>插入代码    Ctrl + K<br>插入图片    Ctrl + G<br>提升标题    Ctrl + H<br>有序列表    Ctrl + O<br>无序列表    Ctrl + U<br>横线        Ctrl + R<br>撤销        Ctrl + Z<br>重做        Ctrl + Y</p><h2 id="2-字体设置斜体、粗体、删除线"><a href="#2-字体设置斜体、粗体、删除线" class="headerlink" title="2.字体设置斜体、粗体、删除线"></a>2.字体设置斜体、粗体、删除线</h2><p><em>这里是文字</em><br>_这里是文字_<br><strong>这里是文字</strong><br><strong><em>这里是文字</em></strong><br><del>这里是文字</del><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-05-28.png" alt></p><h2 id="3-分割线"><a href="#3-分割线" class="headerlink" title="3.分割线"></a>3.分割线</h2><p>你可以在一行中用三个以上的星号(*)、减号(-)、底线(_)来建立一个分隔线，行内不能有其他东西。你也可以在星号或是减号中间插入空格。</p><h2 id="4-引用"><a href="#4-引用" class="headerlink" title="4.引用"></a>4.引用</h2><p>在被引用的文本前加上&gt;符号，以及一个空格就可以了，如果只输入了一个&gt;符号会产生一个空白的引用。</p><blockquote><p>好耶</p></blockquote><h2 id="5-引用的嵌套使用"><a href="#5-引用的嵌套使用" class="headerlink" title="5.引用的嵌套使用"></a>5.引用的嵌套使用</h2><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-09-51.png" alt></p><p><del>看教程看到一半发现有更好的教程，上面也懒得删了</del></p><p><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-22.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-28-56.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-33.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-29-58.png" alt><br><img src="/2022/03/03/Markdown%E6%95%99%E7%A8%8B/2022-03-04-16-30-16.png" alt></p>]]></content>
+      
+      
       <categories>
-        <category>算法</category>
+          
+          <category> Markdawn教程 </category>
+          
       </categories>
-      <tags>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>堆排序及优先队列</title>
-    <url>/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/</url>
-    <content><![CDATA[<h1 id="准备知识"><a href="#准备知识" class="headerlink" title="准备知识"></a>准备知识</h1><h2 id="1-大根堆和小根堆"><a href="#1-大根堆和小根堆" class="headerlink" title="1.大根堆和小根堆"></a>1.大根堆和小根堆</h2><blockquote>
-<p>性质：每个结点的值都大于其左孩子和右孩子结点的值，称之为大根堆；每个结点的值都小于其左孩子和右孩子结点的值，称之为小根堆。<br><img src="/2022/03/07/%E5%A0%86%E6%8E%92%E5%BA%8F%E5%8F%8A%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/2022-03-07-22-44-45.png" alt></p>
-</blockquote>
-]]></content>
+      
+      
+        <tags>
+            
+            <tag> Markdown </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>hexo使用教程</title>
+      <link href="/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/"/>
+      <url>/2022/03/03/hexo%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<p>1.hexo n “title” 新建一个文章</p><p>2.hexo g 重新生成博客</p><p>3.hexo s 本地运行</p><p>4.hexo clean 清除缓存</p><p>5.hexo d 上传到github仓库</p>]]></content>
+      
+      
       <categories>
-        <category>算法</category>
+          
+          <category> hexo使用教程 </category>
+          
       </categories>
-      <tags>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>手撕梯度消失及梯度爆炸</title>
-    <url>/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/</url>
-    <content><![CDATA[<h1 id="梯度消失and爆炸"><a href="#梯度消失and爆炸" class="headerlink" title="梯度消失and爆炸"></a>梯度消失and爆炸</h1><p><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-55-13.png" alt><br>以上图为例开始推起来，先说明几点，i1，i2是输入节点，h1，h2为隐藏层节点，o1，o2为输出层节点，除了输入层，其他两层的节点结构为下图所示：<br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-57-34.png" alt><br><img src="/2022/03/06/%E6%89%8B%E6%92%95%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%8F%8A%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8/2022-03-06-10-58-34.png" alt></p>
-]]></content>
-      <categories>
-        <category>奇怪的知识</category>
-      </categories>
-      <tags>
-        <tag>Machine Learning</tag>
-      </tags>
-  </entry>
+      
+      
+        <tags>
+            
+            <tag> hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>之前的博客</title>
+      <link href="/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/"/>
+      <url>/2022/03/03/%E4%B9%8B%E5%89%8D%E7%9A%84%E5%8D%9A%E5%AE%A2/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://blog.csdn.net/Recursions">https://blog.csdn.net/Recursions</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2022/03/03/hello-world/"/>
+      <url>/2022/03/03/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
 </search>
